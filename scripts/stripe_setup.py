@@ -87,7 +87,14 @@ class Stripe:
 
 
 def find_product(stripe: Stripe) -> dict | None:
-    products = stripe.get("/products", active="true", limit=100)["data"]
+    products: list[dict] = []
+    params: dict[str, str | int] = {"active": "true", "limit": 100}
+    while True:  # every page: a match on a later one must not be mistaken for "none"
+        page = stripe.get("/products", **params)
+        products.extend(page["data"])
+        if not page.get("has_more") or not page["data"]:
+            break
+        params["starting_after"] = page["data"][-1]["id"]
     for product in products:
         if product.get("metadata", {}).get("vigilo") == "pro":
             return product

@@ -146,3 +146,21 @@ def test_a_same_named_product_without_the_marker_stops_the_script_instead_of_dup
         setup.run(stripe, apply=True, webhook_url=None)
 
     assert fake.posts == []  # nothing was created
+
+
+def test_a_marked_product_on_a_later_page_is_found_instead_of_creating_another():
+    pages = {
+        None: {"data": [{"id": f"prod_{i}", "metadata": {}} for i in range(100)], "has_more": True},
+        "prod_99": {
+            "data": [{"id": "prod_late", "metadata": {"vigilo": "pro"}}],
+            "has_more": False,
+        },
+    }
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.method == "GET"
+        return httpx.Response(200, json=pages[request.url.params.get("starting_after")])
+
+    stripe = setup.Stripe("sk_test_x", transport=httpx.MockTransport(handler))
+
+    assert setup.find_product(stripe)["id"] == "prod_late"
