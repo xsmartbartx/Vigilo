@@ -135,3 +135,14 @@ def test_a_missing_or_unrecognised_key_is_refused(monkeypatch):
     assert setup.main(["--mode", "test"]) == 2
     monkeypatch.setenv("STRIPE_SECRET_KEY", "not-a-key")
     assert setup.main(["--mode", "test"]) == 2
+
+
+def test_a_same_named_product_without_the_marker_stops_the_script_instead_of_duplicating(capsys):
+    fake = FakeStripe()
+    fake.products.append({"id": "prod_old", "name": "Vigilo Pro", "metadata": {}})
+    stripe = setup.Stripe("sk_test_x", transport=httpx.MockTransport(fake.handler))
+
+    with pytest.raises(setup.SetupError, match="prod_old"):
+        setup.run(stripe, apply=True, webhook_url=None)
+
+    assert fake.posts == []  # nothing was created

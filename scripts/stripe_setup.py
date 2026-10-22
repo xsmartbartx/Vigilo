@@ -87,9 +87,19 @@ class Stripe:
 
 
 def find_product(stripe: Stripe) -> dict | None:
-    for product in stripe.get("/products", active="true", limit=100)["data"]:
+    products = stripe.get("/products", active="true", limit=100)["data"]
+    for product in products:
         if product.get("metadata", {}).get("vigilo") == "pro":
             return product
+    # A product with our name but not our marker (made by hand or by an earlier tool) would
+    # silently be duplicated, and the app may already sell its prices. Stop and say so.
+    unmarked = [p for p in products if p.get("name") == PRODUCT_NAME]
+    if unmarked:
+        raise SetupError(
+            f"an active product named '{PRODUCT_NAME}' ({unmarked[0]['id']}) exists without the "
+            "metadata vigilo=pro. Add that metadata to it in the Stripe dashboard to adopt it "
+            "(or archive it first), then re-run. Nothing was created."
+        )
     return None
 
 
