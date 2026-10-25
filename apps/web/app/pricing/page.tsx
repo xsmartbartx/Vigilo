@@ -22,9 +22,9 @@ export default function PricingPage() {
           tiers={PLANS.vigilo}
           actions={{
             free: { href: "/#scan", label: "Scan free" },
-            // Signed-out visitors are sent to sign in and come back to the billing page, where
-            // the Upgrade buttons start Stripe Checkout.
-            pro: { href: "/dashboard/billing", label: "Get Pro" },
+            // Sign in (a signed-in visitor is passed straight through) and land on the billing
+            // page, where the Upgrade buttons start Stripe Checkout.
+            pro: { href: "/sign-in?redirect_url=%2Fdashboard%2Fbilling", label: "Get Pro" },
           }}
         />
         <p className="text-sm text-nx-text-muted">
