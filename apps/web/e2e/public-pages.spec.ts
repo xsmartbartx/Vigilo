@@ -24,8 +24,11 @@ test("F01-H1 pricing shows Vigilo's plans only and toggles annual prices", async
   await expect(page.getByText("$29/mo")).toBeVisible();
   await page.getByRole("radio", { name: "Annual" }).click();
   await expect(page.getByText("$290/yr")).toBeVisible();
-  // A visitor can start buying: "Get Pro" leads to the billing page (sign-in first if signed out).
-  await expect(page.getByRole("link", { name: "Get Pro" })).toHaveAttribute("href", "/dashboard/billing");
+  // A visitor can start buying: "Get Pro" signs them in and returns them to the billing page.
+  await expect(page.getByRole("link", { name: "Get Pro" })).toHaveAttribute(
+    "href",
+    "/sign-in?redirect_url=%2Fdashboard%2Fbilling",
+  );
   for (const other of ["Sentinel", "CSPM", "Gateway", "NeuraWall"]) {
     await expect(page.getByRole("heading", { name: other })).toHaveCount(0);
   }
