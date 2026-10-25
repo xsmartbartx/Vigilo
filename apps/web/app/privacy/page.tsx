@@ -54,7 +54,7 @@ export default function PrivacyPolicyPage() {
             <li>
               <strong>Billing information</strong> — if you subscribe to a
               paid plan, payment details are collected and processed
-              directly by our merchant-of-record payment provider; we
+              directly by our payment provider, Stripe; we
               receive only your subscription status and plan, never your
               card details.
             </li>
@@ -106,7 +106,7 @@ export default function PrivacyPolicyPage() {
           <p>
             We use a small number of subprocessors to run the service:
             our cloud hosting and database provider, our authentication
-            provider (Clerk), our merchant-of-record billing provider, and
+            provider (Clerk), our payment provider (Stripe), and
             an LLM provider used to generate plain-language remediation
             guidance for findings. Data sent to the LLM provider is limited
             to already-redacted finding summaries — never raw evidence or
