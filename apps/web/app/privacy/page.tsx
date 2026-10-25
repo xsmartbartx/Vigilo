@@ -54,9 +54,11 @@ export default function PrivacyPolicyPage() {
             <li>
               <strong>Billing information</strong> — if you subscribe to a
               paid plan, payment details are collected and processed
-              directly by our payment provider, Stripe; we
-              receive only your subscription status and plan, never your
-              card details.
+              directly by our payment provider, Stripe. We never receive
+              your card details. We store your plan and subscription status,
+              the Stripe customer and subscription identifiers, the billing
+              interval (monthly or yearly), the end of the current billing
+              period, and whether you have asked to cancel.
             </li>
             <li>
               <strong>Operational logs</strong> — standard request logs and
