@@ -54,7 +54,9 @@ def _http(body: str = "") -> HttpObservation:
 
 
 def _bundle(excerpt: str) -> BundleObservation:
-    return BundleObservation(fetched_scripts=[FetchedScript(url="https://target.test/s.js", excerpt=excerpt)])
+    return BundleObservation(
+        fetched_scripts=[FetchedScript(url="https://target.test/s.js", excerpt=excerpt)]
+    )
 
 
 async def test_supabase_pointing_at_internal_address_is_denied():
@@ -114,4 +116,3 @@ async def test_no_test_in_this_module_performs_real_network_io():
     test_egress_guard.py's identically-named test: every case above passes
     an explicit `resolver=` and a transport that raises on any request, so
     neither real DNS nor a real socket is ever reached."""
-    assert True

@@ -59,7 +59,7 @@ async def _target_or_404(
     return await require_target_role(session, account, target_id, minimum)
 
 
-@router.post("", status_code=201, response_model=TargetResponse)
+@router.post("", status_code=201)
 async def create_target_endpoint(
     body: TargetCreate,
     account: AccountDep,
@@ -92,7 +92,7 @@ async def create_target_endpoint(
     return _to_response(target)
 
 
-@router.get("", response_model=list[TargetResponse])
+@router.get("")
 async def list_targets_endpoint(
     account: AccountDep,
     org: ActiveOrgDep,
@@ -103,7 +103,7 @@ async def list_targets_endpoint(
     return [_to_response(target) for target in targets]
 
 
-@router.get("/{target_id}", response_model=TargetResponse)
+@router.get("/{target_id}")
 async def get_target_endpoint(
     target_id: uuid.UUID,
     account: AccountDep,
@@ -117,9 +117,7 @@ async def get_target_endpoint(
     return response
 
 
-@router.post(
-    "/{target_id}/verification", status_code=201, response_model=VerificationInitiateResponse
-)
+@router.post("/{target_id}/verification", status_code=201)
 async def initiate_verification(
     target_id: uuid.UUID,
     body: VerificationInitiate,
@@ -152,7 +150,6 @@ async def initiate_verification(
 @router.post(
     "/{target_id}/verification/{proof_id}/check",
     status_code=202,
-    response_model=VerificationCheckResponse,
 )
 async def check_verification(
     target_id: uuid.UUID,

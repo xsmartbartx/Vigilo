@@ -1,115 +1,82 @@
 import Link from "next/link";
+import { ScanSubmitForm } from "../components/ScanSubmitForm";
+import { LandingSections } from "../components/marketing/LandingSections";
+import { SiteShell } from "../components/vigilo-site/SiteChrome";
 import { brand } from "../lib/brand";
-import { GetStartedButton, PlatformShell, SecondaryLink } from "../components/marketing/PlatformShell";
-import { Badge, Card } from "../components/ui";
-import { PRODUCTS } from "../lib/nexora/catalog";
-import { PLATFORM, SHARED } from "../lib/nexora/platform";
+import { NEXORA_URL } from "../lib/site";
 
 export const metadata = {
-  title: `${PLATFORM.name}: ${PLATFORM.tagline}`,
-  description: PLATFORM.summary,
+  title: `${brand.name}: ${brand.shortDescription}`,
+  description: brand.shortDescription,
 };
 
-const STEPS = [
-  { title: "Create an account", body: "One sign-up gives you a personal workspace. Make an organisation when you want a team." },
-  { title: "Turn on the products you need", body: "Enable each product for your organisation from the console. Nothing is installed." },
-  { title: "Invite your team", body: "Give each person a role, then manage keys, plans and usage in one place." },
-];
-
-const STATUS_LABEL = { live: "Live", beta: "Beta", soon: "Coming soon" } as const;
+// What the product does, stated as facts about how it works (no counts of users or
+// customers: there is nothing to count yet).
+const FACTS = [
+  { value: "64", label: "checks, from security headers to exposed keys and databases" },
+  { value: "1", label: "recorded request behind every finding, shown with the answer it got" },
+  { value: "0", label: "code access needed: it looks at your site the way a stranger would" },
+] as const;
 
 export default function HomePage() {
   return (
-    <PlatformShell>
-      <section className="mx-auto w-full max-w-[1120px] space-y-6 px-4 py-20 sm:px-6">
-        <p className="text-sm font-medium text-nx-accent">{PLATFORM.tagline}</p>
-        <h1 className="max-w-3xl text-[40px] font-bold leading-[44px] text-nx-text">{PLATFORM.headline}</h1>
-        <p className="max-w-2xl text-lg text-nx-text-muted">{PLATFORM.summary}</p>
-        <div className="flex flex-wrap gap-3">
-          <GetStartedButton />
-          <SecondaryLink href="/products">Explore products</SecondaryLink>
-          <SecondaryLink href={`mailto:${brand.supportEmail}`}>Talk to us</SecondaryLink>
+    <SiteShell>
+      <section aria-labelledby="hero" className="mx-auto w-full max-w-[1120px] px-4 pb-16 pt-16 text-center sm:px-6 sm:pt-24">
+        <p className="text-sm font-medium text-nx-accent">
+          {brand.name} <span className="text-nx-text-muted">· a NEXORA product</span>
+        </p>
+        <h1
+          id="hero"
+          className="mx-auto mt-4 max-w-4xl text-[36px] font-bold leading-[40px] tracking-tight text-nx-text sm:text-[56px] sm:leading-[60px]"
+        >
+          Other scanners bury you in alerts. {brand.name} shows only what it can prove.
+        </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-lg text-nx-text-muted sm:text-xl">
+          Paste your live URL. Get a plain-language report where every problem carries its evidence and a fix you
+          can paste into your AI coding tool.
+        </p>
+        <div id="scan" className="mx-auto mt-10 flex max-w-xl scroll-mt-24 justify-center">
+          <ScanSubmitForm />
         </div>
+        <p className="mt-4 text-sm text-nx-text-muted">
+          The first scan is free and needs only your email.{" "}
+          <Link href="/#how" className="text-nx-accent underline underline-offset-2">
+            See how it works
+          </Link>
+        </p>
       </section>
 
-      <section aria-labelledby="platform" className="border-y border-nx-border bg-nx-surface">
-        <div className="mx-auto w-full max-w-[1120px] space-y-6 px-4 py-16 sm:px-6">
-          <div className="max-w-2xl space-y-2">
-            <h2 id="platform" className="text-[28px] font-bold leading-[34px] text-nx-text">
-              The platform comes first, the products second
+      <section aria-label={`${brand.name} in numbers`} className="border-y border-nx-border bg-nx-surface">
+        <dl className="mx-auto grid w-full max-w-[1120px] gap-8 px-4 py-12 text-center sm:grid-cols-3 sm:px-6">
+          {FACTS.map((fact) => (
+            <div key={fact.label}>
+              <dt className="text-[44px] font-bold leading-[48px] text-nx-text">{fact.value}</dt>
+              <dd className="mx-auto mt-2 max-w-[240px] text-sm text-nx-text-muted">{fact.label}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <LandingSections />
+
+      <section aria-labelledby="platform" className="border-t border-nx-border bg-nx-surface">
+        <div className="mx-auto flex w-full max-w-[1120px] flex-wrap items-center justify-between gap-4 px-4 py-10 sm:px-6">
+          <div className="max-w-xl">
+            <h2 id="platform" className="text-lg font-semibold text-nx-text">
+              {brand.name} is one product on NEXORA
             </h2>
-            <p className="text-nx-text-muted">
-              Every product runs on the same foundation, so a new tool never means a new login, a new
-              bill or a new set of keys.
+            <p className="mt-1 text-sm text-nx-text-muted">
+              The same account and organisation work across NEXORA products. See what else is on the platform.
             </p>
           </div>
-          <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {SHARED.map((item) => (
-              <li key={item.title}>
-                <Card className="h-full space-y-2">
-                  <h3 className="text-lg font-semibold text-nx-text">{item.title}</h3>
-                  <p className="text-sm text-nx-text-muted">{item.body}</p>
-                </Card>
-              </li>
-            ))}
-          </ul>
+          <a
+            href={`${NEXORA_URL}/products`}
+            className="inline-flex h-10 items-center rounded-nx-md border border-nx-border-input px-4 text-sm font-semibold text-nx-text hover:bg-nx-bg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nx-accent"
+          >
+            Explore NEXORA products
+          </a>
         </div>
       </section>
-
-      <section aria-labelledby="products" className="mx-auto w-full max-w-[1120px] space-y-6 px-4 py-16 sm:px-6">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <h2 id="products" className="text-[28px] font-bold leading-[34px] text-nx-text">Products</h2>
-          <Link href="/products" className="text-sm text-nx-accent underline underline-offset-2">
-            See all products
-          </Link>
-        </div>
-        <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {PRODUCTS.map((p) => (
-            <li key={p.slug}>
-              <Card className="flex h-full flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-nx-text">
-                    <Link href={`/products/${p.slug}`} className="hover:underline">
-                      {p.name}
-                    </Link>
-                  </h3>
-                  <Badge tone={p.status === "live" ? "success" : p.status === "beta" ? "accent" : "neutral"}>
-                    {STATUS_LABEL[p.status]}
-                  </Badge>
-                </div>
-                <p className="text-sm text-nx-text-muted">{p.category}</p>
-                <p className="text-sm text-nx-text">{p.pitch}</p>
-              </Card>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section aria-labelledby="how" className="border-t border-nx-border bg-nx-surface">
-        <div className="mx-auto w-full max-w-[1120px] space-y-4 px-4 py-16 sm:px-6">
-          <h2 id="how" className="text-[28px] font-bold leading-[34px] text-nx-text">How it works</h2>
-          <ol className="grid gap-4 md:grid-cols-3">
-            {STEPS.map((s, i) => (
-              <li key={s.title}>
-                <Card className="h-full space-y-2">
-                  <p className="text-sm font-semibold text-nx-accent">Step {i + 1}</p>
-                  <h3 className="text-lg font-semibold text-nx-text">{s.title}</h3>
-                  <p className="text-sm text-nx-text-muted">{s.body}</p>
-                </Card>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section aria-labelledby="cta" className="mx-auto w-full max-w-[1120px] space-y-4 px-4 py-20 text-center sm:px-6">
-        <h2 id="cta" className="text-[28px] font-bold leading-[34px] text-nx-text">Start with one product</h2>
-        <p className="text-nx-text-muted">The free scan needs no account. Everything else starts from one sign-up.</p>
-        <div className="flex flex-wrap justify-center gap-3">
-          <GetStartedButton />
-          <SecondaryLink href="/products/vigilo">Scan a site</SecondaryLink>
-        </div>
-      </section>
-    </PlatformShell>
+    </SiteShell>
   );
 }

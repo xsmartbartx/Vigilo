@@ -28,7 +28,7 @@ _log = logging.getLogger(__name__)
 router = APIRouter(prefix="/v1", tags=["accounts"])
 
 
-@router.get("/me", response_model=AccountResponse)
+@router.get("/me")
 async def get_me(account: AccountDep) -> AccountResponse:
     return AccountResponse(
         account_id=account.id,
@@ -62,14 +62,14 @@ class DeleteAccountResponse(BaseModel):
     storage_cleanup: str
 
 
-@router.get("/me/deletion-check", response_model=DeletionCheckResponse)
+@router.get("/me/deletion-check")
 async def check_account_deletion(account: AccountDep, session: SessionDep) -> DeletionCheckResponse:
     """What must be done before this account can be deleted (may be nothing)."""
     blockers = await account_deletion.deletion_blockers(session, account)
     return DeletionCheckResponse(blockers=[DeletionBlockerResponse(**b.__dict__) for b in blockers])
 
 
-@router.post("/me/delete", response_model=DeleteAccountResponse)
+@router.post("/me/delete")
 async def delete_my_account(
     body: DeleteAccountRequest, account: AccountDep, session: SessionDep
 ) -> DeleteAccountResponse:

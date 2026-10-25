@@ -50,7 +50,7 @@ async def _is_owner(session: SessionDep, account: Account | None, target_id: uui
     return role is not None and role_at_least(role, "admin")
 
 
-@router.get("/v1/scans/{scan_job_id}/report", response_model=ScanReportResponse)
+@router.get("/v1/scans/{scan_job_id}/report")
 async def get_scan_report(
     scan_job_id: uuid.UUID, session: SessionDep, account: OptionalAccountDep
 ) -> ScanReportResponse:
@@ -75,9 +75,7 @@ async def get_scan_report(
     return response
 
 
-@router.post(
-    "/v1/scans/{scan_job_id}/report/pdf", status_code=202, response_model=PdfStatusResponse
-)
+@router.post("/v1/scans/{scan_job_id}/report/pdf", status_code=202)
 async def request_report_pdf(
     scan_job_id: uuid.UUID, session: SessionDep, queue: QueueDep
 ) -> PdfStatusResponse:
@@ -94,7 +92,7 @@ async def request_report_pdf(
     return PdfStatusResponse(report_id=report.id, status=report.status)
 
 
-@router.get("/v1/scans/{scan_job_id}/report/pdf", response_model=PdfStatusResponse)
+@router.get("/v1/scans/{scan_job_id}/report/pdf")
 async def get_report_pdf_status(scan_job_id: uuid.UUID, session: SessionDep) -> PdfStatusResponse:
     scan = await get_scan_by_job_id(session, scan_job_id)
     if scan is None:

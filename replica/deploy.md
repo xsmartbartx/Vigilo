@@ -110,3 +110,32 @@ So do **not** run `scripts/vps_setup.sh` there: it refuses to overwrite `.env` a
 - `/opt/vigilo` runs `ebe4106` (upstream `main` before pull request #9). Database revision `0009`.
 - `/opt/vigilo/.env` uses `STRIPE_PRICE_ID_PRO=price_1UKKeS...` and `STRIPE_PRICE_ID_PRO_YEARLY=price_1UKKlh...`. The product, prices and portal that `stripe_setup.py` created on 2026-10-09 (`price_1UOfNw...`, `price_1UOfNx...`) are **not** referenced there. Decide which set to keep, then archive the other in Stripe and set the env to match. Do not change the env while subscriptions exist on the old prices without checking: the webhook maps price IDs to plans.
 - The server also runs the Nexora platform from `/opt/nexora` (`deploy.sh nexora console api ...`). Check it does not depend on upstream's NEXORA Core billing sync (`/v1/internal/org-plan`), which this branch removed.
+
+### Showing the running commit (2026-10-11)
+`/version` now includes `"commit"` (the image's `GIT_SHA` build arg; `"unknown"` without one) and `scripts/smoke.sh` prints it. The repo's own `scripts/deploy.sh` exports `GIT_SHA` before building. The shared platform script (`/opt/nexora/infrastructure/deployment/deploy.sh`, a different repository) is what actually deploys production and must export it too, or the field stays `"unknown"`. In its `vigilo)` branch, after `git pull --ff-only`, add:
+
+    export GIT_SHA="$(git rev-parse --short HEAD)"
+
+`docker compose build` then picks it up through the compose file's `GIT_SHA: ${GIT_SHA:-unknown}`.
+
+### Automatic backups and a disk check (2026-10-11)
+On the server, from the checkout (`/opt/vigilo`), as the user that runs Docker:
+
+    ./scripts/install-backup-cron.sh --dry-run          # shows the two cron lines
+    ./scripts/install-backup-cron.sh                    # installs them (re-runnable)
+
+03:00 daily: `backup.sh` into `~/vigilo-backups`, keeping 14 days. 03:30 daily: `check-disk.sh 85`, appending a line to `disk.log` (it exits non-zero at 85% or more; nothing emails it yet, so read the log or add an alert). The backups sit on the same disk as the data, so also copy them off the machine. A restore was tested on 2026-10-11 (the 0009-era dump restored into a scratch database: 5 accounts, 5 projects, 18 tables).
+
+### NEXORA Core plan sync (restored 2026-10-12)
+`POST /v1/internal/org-plan` exists again. It is off (404) unless `NEXORA_SYNC_SECRET` is set, and the value must equal Core's. Production had it set for the Core integration: **check without printing values**, then redeploy:
+
+    ssh -i ~/.ssh/nexora-prod.pem opc@92.5.69.99 "grep -c '^NEXORA_SYNC_SECRET=.' /opt/vigilo/.env"   # 1 = set
+
+After the deploy an unsigned call must answer 401 (what Nexora's own smoke test expects):
+
+    curl -s -o /dev/null -w "%{http_code}\n" -X POST https://vigilo-api.onenexora.com/v1/internal/org-plan -H 'content-type: application/json' -d '{}'
+
+### Clerk organisations (ADR-0014 phase 2, 2026-10-12)
+1. Clerk dashboard, JWT templates, `vigilo-api`: add the claims `"org_id": "{{org.id}}"`, `"org_role": "{{org.role}}"`, `"org_name": "{{org.name}}"` (they are absent when no organisation is active, which is the personal-workspace case).
+2. Migrate (adds table `core_org_plans`; nothing else changes): `ssh ... "cd /opt/vigilo && sudo docker compose exec api uv run alembic -c packages/persistence/alembic.ini upgrade head"`, then deploy.
+3. Rollback: remove the claims from the template and nothing links; the table is harmless.

@@ -1,6 +1,10 @@
 import path from "node:path";
 import type { NextConfig } from "next";
 
+// Where the company and platform pages live. Vigilo is a product with its own site; the
+// catalogue of all products and the other products' pages are on the Nexora site.
+const NEXORA = (process.env.NEXT_PUBLIC_NEXORA_URL ?? "https://onenexora.com").replace(/\/$/, "");
+
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
@@ -20,6 +24,15 @@ const nextConfig: NextConfig = {
   // widening as Turbopack above, for the same brand.config.json reason —
   // Next's default tracing root is apps/web itself, which wouldn't see two
   // directories up.
+  async redirects() {
+    return [
+      // Vigilo's page is now the home page of this site.
+      { source: "/products/vigilo", destination: "/", permanent: true },
+      // Temporary (307): the target is another site we do not control the paths of.
+      { source: "/products", destination: `${NEXORA}/products`, permanent: false },
+      { source: "/products/:slug", destination: `${NEXORA}/products/:slug`, permanent: false },
+    ];
+  },
   output: "standalone",
   outputFileTracingRoot: path.join(__dirname, "..", ".."),
 };

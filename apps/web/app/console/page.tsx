@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PRODUCTS } from "../../lib/nexora/catalog";
+import { NEXORA_URL } from "../../lib/site";
 import { getActiveOrg, listProductStates } from "../../lib/nexora/data";
 import { enableProduct } from "./actions";
 import { Button, ProductTile, type ProductStatus } from "../../components/ui";
@@ -20,7 +21,7 @@ export default async function ConsoleHomePage() {
           const enabled = state?.enabled ?? false;
           const available = state?.available ?? product.status === "live";
           const status: ProductStatus = enabled ? "enabled" : available ? "available" : "soon";
-          const href = product.slug === "vigilo" ? "/dashboard" : `/products/${product.slug}`;
+          const href = product.slug === "vigilo" ? "/dashboard" : `${NEXORA_URL}/products/${product.slug}`;
           return (
             <li key={product.slug}>
               <ProductTile

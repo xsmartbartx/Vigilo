@@ -35,7 +35,9 @@ def _fake_resolver(hostname: str) -> list[str]:
 
 
 def _never_called_handler(request: httpx.Request) -> httpx.Response:
-    raise AssertionError("no HTTP request should have been attempted — egress guard should deny first")
+    raise AssertionError(
+        "no HTTP request should have been attempted — egress guard should deny first"
+    )
 
 
 @pytest.mark.parametrize("hostname", ["internal.test", "metadata.test"])
@@ -66,7 +68,10 @@ async def test_verify_wellknown_file_matches_exact_content():
         return httpx.Response(200, content=b"expected-nonce")
 
     result = await verify_wellknown_file(
-        "https://safe.test", "expected-nonce", resolver=_fake_resolver, transport=httpx.MockTransport(handler)
+        "https://safe.test",
+        "expected-nonce",
+        resolver=_fake_resolver,
+        transport=httpx.MockTransport(handler),
     )
     assert result.verified is True
     assert result.method == VerificationMethod.WELLKNOWN_FILE
@@ -77,7 +82,10 @@ async def test_verify_wellknown_file_rejects_mismatched_content():
         return httpx.Response(200, content=b"some-other-value")
 
     result = await verify_wellknown_file(
-        "https://safe.test", "expected-nonce", resolver=_fake_resolver, transport=httpx.MockTransport(handler)
+        "https://safe.test",
+        "expected-nonce",
+        resolver=_fake_resolver,
+        transport=httpx.MockTransport(handler),
     )
     assert result.verified is False
 
@@ -98,7 +106,10 @@ async def test_verify_meta_tag_matches_content_attribute():
         return httpx.Response(200, content=html)
 
     result = await verify_meta_tag(
-        "https://safe.test", "expected-nonce", resolver=_fake_resolver, transport=httpx.MockTransport(handler)
+        "https://safe.test",
+        "expected-nonce",
+        resolver=_fake_resolver,
+        transport=httpx.MockTransport(handler),
     )
     assert result.verified is True
     assert result.method == VerificationMethod.META_TAG
@@ -109,7 +120,10 @@ async def test_verify_meta_tag_rejects_a_page_with_no_matching_tag():
         return httpx.Response(200, content=b"<html><head></head></html>")
 
     result = await verify_meta_tag(
-        "https://safe.test", "expected-nonce", resolver=_fake_resolver, transport=httpx.MockTransport(handler)
+        "https://safe.test",
+        "expected-nonce",
+        resolver=_fake_resolver,
+        transport=httpx.MockTransport(handler),
     )
     assert result.verified is False
 
@@ -159,4 +173,3 @@ def test_no_test_in_this_module_performs_real_network_io():
     """Documents the invariant by construction: every DNS-touching call
     above passes an explicit `resolver=`/`txt_resolver=`, and every
     HTTP-touching call passes an explicit `transport=`."""
-    assert True

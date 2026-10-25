@@ -1,0 +1,12 @@
+# Keeps the commit-SHA pins in .github/workflows current. Only GitHub Actions is listed
+# here on purpose: Python and npm security updates continue through the repository's
+# GitHub settings, unchanged.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns: ["*"]

@@ -15,32 +15,38 @@ async function guard(page: Page) {
   return problems;
 }
 
-test("F01-H1 pricing lists every product and toggles annual prices", async ({ page }) => {
+const NEXORA = (process.env.NEXT_PUBLIC_NEXORA_URL ?? "https://onenexora.com").replace(/\/$/, "");
+
+test("F01-H1 pricing shows Vigilo's plans only and toggles annual prices", async ({ page }) => {
   const problems = await guard(page);
   await page.goto("/pricing");
-  await expect(page.getByRole("heading", { level: 1, name: "Pricing" })).toBeVisible();
-  for (const name of ["Vigilo", "Sentinel", "CSPM", "Gateway", "NeuraWall"]) {
-    await expect(page.getByRole("heading", { level: 2, name })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Vigilo pricing" })).toBeVisible();
+  await expect(page.getByText("$29/mo")).toBeVisible();
+  await page.getByRole("radio", { name: "Annual" }).click();
+  await expect(page.getByText("$290/yr")).toBeVisible();
+  for (const other of ["Sentinel", "CSPM", "Gateway", "NeuraWall"]) {
+    await expect(page.getByRole("heading", { name: other })).toHaveCount(0);
   }
-  const vigilo = page.getByRole("region", { name: "Vigilo" });
-  await expect(vigilo.getByText("$29/mo")).toBeVisible();
-  await vigilo.getByRole("radio", { name: "Annual" }).click();
-  await expect(vigilo.getByText("$290/yr")).toBeVisible();
   expect(problems).toEqual([]);
 });
 
-test("F01-H2 products page shows status badges", async ({ page }) => {
-  const problems = await guard(page);
-  await page.goto("/products");
-  await expect(page.getByRole("heading", { level: 2, name: "Vigilo" })).toBeVisible();
-  await expect(page.getByText("Live", { exact: true })).toBeVisible();
-  await expect(page.getByText("Coming soon", { exact: true }).first()).toBeVisible();
-  expect(problems).toEqual([]);
+test("F01-H2 the platform catalogue lives on the Nexora site: old product URLs redirect there", async ({
+  request,
+}) => {
+  for (const [from, to, status] of [
+    ["/products", `${NEXORA}/products`, 307],
+    ["/products/sentinel", `${NEXORA}/products/sentinel`, 307],
+    ["/products/vigilo", "/", 308],
+  ] as const) {
+    const res = await request.get(from, { maxRedirects: 0 });
+    expect(res.status(), from).toBe(status);
+    expect(res.headers()["location"], from).toBe(to);
+  }
 });
 
 test("F01-E1 no horizontal scroll at this viewport", async ({ page }) => {
   await guard(page);
-  for (const path of ["/pricing", "/products"]) {
+  for (const path of ["/", "/pricing"]) {
     await page.goto(path);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -52,61 +58,47 @@ test("F01-E1 no horizontal scroll at this viewport", async ({ page }) => {
 test("F01-E2 keyboard can reach and flip the billing interval", async ({ page }) => {
   await guard(page);
   await page.goto("/pricing");
-  const annual = page.getByRole("region", { name: "Sentinel" }).getByRole("radio", { name: "Annual" });
+  const annual = page.getByRole("radio", { name: "Annual" });
   await annual.focus();
   await page.keyboard.press("Enter");
   await expect(annual).toHaveAttribute("aria-checked", "true");
 });
 
-test("F01-H4 home leads to the products and to sign-up", async ({ page }) => {
+test("F01-H4 the home page is Vigilo's own: a Nexora bar, product navigation, the scan form", async ({
+  page,
+}) => {
   const problems = await guard(page);
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("One account");
-  await expect(page.getByRole("link", { name: "Explore products" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Get started" }).first()).toHaveAttribute(
-    "href",
-    "/sign-up",
-  );
-  for (const name of ["Vigilo", "Sentinel", "CSPM", "Gateway", "NeuraWall"]) {
-    await expect(page.getByRole("link", { name })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("shows only what it can prove");
+  // The company bar sends people back to the Nexora site.
+  await expect(page.getByRole("link", { name: "NEXORA", exact: true })).toHaveAttribute("href", NEXORA);
+  await expect(page.getByRole("link", { name: "All products" })).toHaveAttribute("href", `${NEXORA}/products`);
+  // The product bar has Vigilo's own sections and a way in.
+  const nav = page.getByRole("navigation", { name: "Vigilo sections" });
+  for (const label of ["How it works", "Features", "Pricing", "FAQ"]) {
+    await expect(nav.getByRole("link", { name: label })).toBeVisible();
   }
+  await expect(page.getByRole("link", { name: "Scan free" })).toHaveAttribute("href", "/#scan");
+  await expect(page.getByRole("button", { name: "Scan it" })).toBeVisible();
+  // It is not the platform's home any more.
+  await expect(page.getByText("One account for the tools")).toHaveCount(0);
   expect(problems).toEqual([]);
 });
 
-test("F01-H5 a product page shows its plans and a way in", async ({ page }) => {
-  const problems = await guard(page);
-  await page.goto("/products/sentinel");
-  await expect(page.getByRole("heading", { level: 1, name: /Sentinel/ })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: "Plans" })).toBeVisible();
-  await expect(page.getByText("$29/mo")).toBeVisible();
-  await expect(page.getByRole("link", { name: "See pricing" })).toBeVisible();
-  expect(problems).toEqual([]);
-});
-
-test("F01-H6 the Vigilo page keeps the scan form", async ({ page }) => {
+test("F01-H6 the home page keeps the scan form", async ({ page }) => {
   await guard(page);
-  await page.goto("/products/vigilo");
+  await page.goto("/");
   await expect(page.getByLabel(/URL|site/i).first()).toBeVisible();
   await expect(page.getByRole("button", { name: "Scan it" })).toBeVisible();
 });
 
-test("F01-E3 category filter narrows the product list", async ({ page }) => {
+test("F01-N1 an unknown page is a 404", async ({ page }) => {
   await guard(page);
-  await page.goto("/products?category=AI");
-  await expect(page.getByRole("heading", { level: 2, name: "Gateway" })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: "Sentinel" })).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "AI" })).toHaveAttribute("aria-current", "page");
-});
-
-test("F01-N1 an unknown product is a 404, and Vigilo is not served by the template", async ({
-  page,
-}) => {
-  await guard(page);
-  const missing = await page.goto("/products/does-not-exist");
+  const missing = await page.goto("/does-not-exist");
   expect(missing?.status()).toBe(404);
 });
 
-for (const path of ["/", "/pricing", "/products", "/products/sentinel", "/products/vigilo"]) {
+for (const path of ["/", "/pricing"]) {
   test(`A11Y axe scan ${path}`, async ({ page }) => {
     await guard(page);
     await page.goto(path);

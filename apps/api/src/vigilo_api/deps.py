@@ -16,8 +16,12 @@ from vigilo_api.access import ActiveOrg, resolve_active_org
 from vigilo_api.auth import ClerkAuthError, verify_clerk_jwt
 from vigilo_api.queue import get_arq_pool
 from vigilo_identity.models import Account, Membership
-from vigilo_identity.org_repository import get_membership, role_at_least
-from vigilo_identity.repository import get_account_by_clerk_id, get_or_create_account
+from vigilo_identity.org_repository import OrgError, get_membership, plan_id_for_org, role_at_least
+from vigilo_identity.repository import (
+    get_account_by_clerk_id,
+    get_or_create_account,
+    link_clerk_org,
+)
 from vigilo_persistence import session_scope
 
 
@@ -47,6 +51,7 @@ async def require_account(request: Request, session: SessionDep) -> Account:
     except ClerkAuthError as exc:
         raise HTTPException(status_code=401, detail=exc.message) from exc
 
+    request.state.clerk_claims = claims
     account = await get_account_by_clerk_id(session, claims.user_id)
     if account is not None:
         return account
@@ -98,13 +103,36 @@ def require_org_role(minimum: str):
     return dep
 
 
+async def claimed_org(
+    request: Request, account: Account, session: AsyncSession
+) -> ActiveOrg | None:
+    """The Vigilo organisation for the Clerk organisation the token names (ADR-0014),
+    linked or created on first use; None when the token names none."""
+    claims = getattr(request.state, "clerk_claims", None)
+    if claims is None or not claims.org_id:
+        return None
+    org, role = await link_clerk_org(
+        session, account, claims.org_id, claims.org_role, claims.org_name
+    )
+    return ActiveOrg(org.id, role, await plan_id_for_org(session, org.id))
+
+
 async def active_org(
+    request: Request,
     account: AccountDep,
     session: SessionDep,
     x_org_id: Annotated[str | None, Header()] = None,
 ) -> ActiveOrg:
-    """The organisation list/create routes act in: `X-Org-Id` if sent, else
-    the caller's personal organisation. See `vigilo_api.access`."""
+    """The organisation list/create routes act in: `X-Org-Id` if sent, else the Clerk
+    organisation the token names (ADR-0014; linked or created on first use), else the
+    caller's personal organisation. See `vigilo_api.access`."""
+    if not x_org_id:
+        try:
+            claimed = await claimed_org(request, account, session)
+        except OrgError as exc:
+            raise HTTPException(status_code=409, detail=exc.message) from exc
+        if claimed is not None:
+            return claimed
     return await resolve_active_org(session, account, x_org_id)
 
 

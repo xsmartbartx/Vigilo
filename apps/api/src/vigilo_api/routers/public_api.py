@@ -111,7 +111,7 @@ async def _owned_scan_job(session: SessionDep, account: KeyAccount, scan_job_id:
     return job
 
 
-@router.post("/scans", status_code=202, response_model=ScanSubmissionResponse)
+@router.post("/scans", status_code=202)
 async def public_submit_scan(
     body: PublicScanSubmission,
     session: SessionDep,
@@ -234,7 +234,7 @@ async def public_submit_scan(
     return ScanSubmissionResponse(scan_job_id=job.id, status=job.status, granted_tier=job.tier)
 
 
-@router.get("/scans/{scan_job_id}", response_model=ScanStatusResponse)
+@router.get("/scans/{scan_job_id}")
 async def public_get_scan_status(
     scan_job_id: uuid.UUID, session: SessionDep, account: ScanReadDep
 ) -> ScanStatusResponse:
@@ -292,7 +292,7 @@ async def public_stream_scan_status(
     )
 
 
-@router.get("/scans/{scan_job_id}/report", response_model=ScanReportResponse)
+@router.get("/scans/{scan_job_id}/report")
 async def public_get_scan_report(
     scan_job_id: uuid.UUID, session: SessionDep, account: ReportReadDep
 ) -> ScanReportResponse:
@@ -313,7 +313,7 @@ async def public_get_scan_report(
     return response
 
 
-@router.get("/scans/{scan_job_id}/findings", response_model=list[ReportFindingResponse])
+@router.get("/scans/{scan_job_id}/findings")
 async def public_get_scan_findings(
     scan_job_id: uuid.UUID, session: SessionDep, account: ReportReadDep
 ) -> list[ReportFindingResponse]:
@@ -341,7 +341,7 @@ async def public_get_scan_report_sarif(
     return JSONResponse(content=sarif, media_type="application/sarif+json")
 
 
-@router.get("/targets/{target_id}/scores", response_model=list[ScoreHistoryEntry])
+@router.get("/targets/{target_id}/scores")
 async def public_get_target_scores(
     target_id: uuid.UUID, session: SessionDep, account: ReportReadDep
 ) -> list[ScoreHistoryEntry]:
@@ -359,7 +359,7 @@ async def public_get_target_scores(
     ]
 
 
-@router.get("/projects", response_model=list[ProjectResponse])
+@router.get("/projects")
 async def public_list_projects(
     session: SessionDep, account: ProjectReadDep
 ) -> list[ProjectResponse]:
@@ -381,7 +381,7 @@ def _to_monitor_response(monitor) -> MonitorResponse:
     )
 
 
-@router.post("/targets/{target_id}/monitors", status_code=201, response_model=MonitorResponse)
+@router.post("/targets/{target_id}/monitors", status_code=201)
 async def public_create_target_monitor(
     target_id: uuid.UUID,
     body: MonitorCreate,
@@ -418,7 +418,7 @@ async def public_create_target_monitor(
     return _to_monitor_response(monitor)
 
 
-@router.get("/targets/{target_id}/monitors", response_model=MonitorResponse)
+@router.get("/targets/{target_id}/monitors")
 async def public_get_target_monitor(
     target_id: uuid.UUID, session: SessionDep, account: MonitorReadDep
 ) -> MonitorResponse:
@@ -429,7 +429,7 @@ async def public_get_target_monitor(
     return _to_monitor_response(monitor)
 
 
-@router.post("/monitors/{monitor_id}/disable", response_model=MonitorResponse)
+@router.post("/monitors/{monitor_id}/disable")
 async def public_disable_monitor(
     monitor_id: uuid.UUID, session: SessionDep, account: MonitorWriteDep
 ) -> MonitorResponse:

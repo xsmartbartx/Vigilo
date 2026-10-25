@@ -35,7 +35,7 @@ class AuditPageResponse(BaseModel):
     actions: list[str]
 
 
-@router.get("/orgs/{org_id}/audit", response_model=AuditPageResponse)
+@router.get("/orgs/{org_id}/audit")
 async def get_audit_log(
     org_id: uuid.UUID,
     admin: Admin,

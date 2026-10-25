@@ -62,6 +62,7 @@ async def migrated_schema():
             "projects",
             "audit_events",
             "organizations",
+            "core_org_plans",
             "accounts",
         ]
         for table in tables:
@@ -106,6 +107,7 @@ async def test_migrations_produce_all_expected_tables(migrated_schema):
         "product_enablements",
         "usage_counters",
         "org_invites",
+        "core_org_plans",
         "alembic_version",
     }
 

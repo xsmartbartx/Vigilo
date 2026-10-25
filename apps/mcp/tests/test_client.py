@@ -16,7 +16,6 @@ from vigilo_mcp.client import (
 def _configured(monkeypatch):
     monkeypatch.setenv("VIGILO_API_KEY", "vglo_test_key")
     monkeypatch.setenv("VIGILO_API_BASE_URL", "https://vigilo.example.com")
-    yield
 
 
 async def test_submit_scan_sends_the_bearer_token_and_body():

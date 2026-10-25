@@ -65,7 +65,6 @@ def _to_response(suppression: Suppression) -> SuppressionResponse:
 @router.post(
     "/v1/targets/{target_id}/findings/suppress",
     status_code=201,
-    response_model=SuppressionResponse,
 )
 async def suppress_finding(
     target_id: uuid.UUID,
@@ -97,7 +96,7 @@ async def suppress_finding(
     return _to_response(suppression)
 
 
-@router.get("/v1/targets/{target_id}/suppressions", response_model=list[SuppressionResponse])
+@router.get("/v1/targets/{target_id}/suppressions")
 async def list_target_suppressions(
     target_id: uuid.UUID, account: AccountDep, session: SessionDep
 ) -> list[SuppressionResponse]:
@@ -108,7 +107,6 @@ async def list_target_suppressions(
 
 @router.post(
     "/v1/targets/{target_id}/suppressions/{suppression_id}/revoke",
-    response_model=SuppressionResponse,
 )
 async def revoke_target_suppression(
     target_id: uuid.UUID,

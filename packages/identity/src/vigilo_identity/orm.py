@@ -217,3 +217,16 @@ class OrgInviteRow(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class CoreOrgPlanRow(Base):
+    """The plan NEXORA Core last sent for a Clerk organisation, kept even when no Vigilo
+    organisation is linked to it yet, and applied when one is."""
+
+    __tablename__ = "core_org_plans"
+
+    clerk_org_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    plan_id: Mapped[str] = mapped_column(String(32))
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )

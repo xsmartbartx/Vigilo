@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vigilo">
+  <rect width="64" height="64" rx="14" fill="#0F172A"/>
+  <!-- Proof in the lens: a check inside a ring. Reports only what it can prove. -->
+  <circle cx="32" cy="32" r="16" fill="none" stroke="#22D3EE" stroke-width="5"/>
+  <path d="M23.5 33 L29.5 39 L41 26" fill="none" stroke="#22D3EE" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

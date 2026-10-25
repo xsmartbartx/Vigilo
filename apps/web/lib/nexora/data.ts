@@ -22,6 +22,8 @@ export interface Org {
   role: Role;
   // The organisation's plan limits (its owner's plan), not the caller's.
   entitlements: EntitlementsResponse;
+  // The Clerk organisation active in the session, which opens by default.
+  isClaimed: boolean;
 }
 
 export interface ProductState {
@@ -61,14 +63,16 @@ export async function listMyOrgs(): Promise<Org[]> {
     isPersonal: o.is_personal,
     role: o.role,
     entitlements: o.entitlements,
+    isClaimed: o.is_claimed ?? false,
   }));
 }
 
 export async function getActiveOrg(): Promise<Org> {
   const orgs = await listMyOrgs();
   const wanted = (await cookies()).get(ACTIVE_ORG_COOKIE)?.value;
-  // GET /v1/orgs always returns at least the personal org.
-  return orgs.find((o) => o.id === wanted) ?? orgs[0];
+  // An explicit choice wins, then the Clerk organisation active in the session, then the
+  // first one. GET /v1/orgs always returns at least the personal org.
+  return orgs.find((o) => o.id === wanted) ?? orgs.find((o) => o.isClaimed) ?? orgs[0];
 }
 
 export async function listProductStates(orgId: string): Promise<ProductState[]> {

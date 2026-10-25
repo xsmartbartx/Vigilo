@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vigilo">
+  <rect width="64" height="64" rx="14" fill="#0F172A"/>
+  <!-- V for Vigilo with a lookout point above it. -->
+  <path d="M17 25 L32 49 L47 25" fill="none" stroke="#22D3EE" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="32" cy="14" r="4.5" fill="#22D3EE"/>
+</svg>

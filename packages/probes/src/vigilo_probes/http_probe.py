@@ -52,7 +52,8 @@ def _parse_set_cookie_headers(raw_headers: list[str]) -> list[CookieObservation]
         jar: SimpleCookie = SimpleCookie()
         try:
             jar.load(header_value)
-        except Exception:  # noqa: BLE001 — a malformed Set-Cookie header is hostile input, not a bug
+        # A malformed Set-Cookie header is hostile input, not a bug.
+        except Exception:  # noqa: BLE001
             continue
         for name, morsel in jar.items():
             raw_max_age = morsel["max-age"]

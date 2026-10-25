@@ -28,6 +28,11 @@ GetSigningKey = Callable[[str], Any]
 class ClerkClaims:
     user_id: str
     email: str | None
+    # The active Clerk organisation, when the token names one: the template shortcodes
+    # (`org_id`, `org_role`, `org_name`) or Clerk's session-token v2 object `o`.
+    org_id: str | None = None
+    org_role: str | None = None
+    org_name: str | None = None
 
 
 class ClerkAuthError(StructuredError):
@@ -62,4 +67,13 @@ def verify_clerk_jwt(token: str, get_signing_key: GetSigningKey | None = None) -
     if not user_id:
         raise ClerkAuthError("session token is missing a subject claim")
 
-    return ClerkClaims(user_id=user_id, email=payload.get("email"))
+    v2 = payload.get("o") if isinstance(payload.get("o"), dict) else {}
+    org_id = payload.get("org_id") or v2.get("id")
+    org_role = payload.get("org_role") or (f"org:{v2['rol']}" if v2.get("rol") else None)
+    return ClerkClaims(
+        user_id=user_id,
+        email=payload.get("email"),
+        org_id=org_id if isinstance(org_id, str) and org_id else None,
+        org_role=org_role if isinstance(org_role, str) else None,
+        org_name=payload.get("org_name") if isinstance(payload.get("org_name"), str) else None,
+    )

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { brand } from "../lib/brand";
+import { NEXORA_URL } from "../lib/site";
 
 export function Footer({ name }: { name?: string } = {}) {
   return (
@@ -26,6 +27,10 @@ export function Footer({ name }: { name?: string } = {}) {
       </nav>
       <p className="mt-4 text-center text-xs text-black/60 dark:text-white/65">
         &copy; {new Date().getFullYear()} {name ?? brand.legalName}
+        {" · "}
+        <a href={NEXORA_URL} className="hover:underline">
+          A NEXORA product
+        </a>
       </p>
     </footer>
   );

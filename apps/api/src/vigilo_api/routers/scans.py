@@ -10,9 +10,10 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
 from vigilo_api.deps import QueueDep, SessionDep
+from vigilo_api.scan_throttle import enforce_scan_limits
 from vigilo_api.schemas import ScanStatusResponse, ScanSubmission, ScanSubmissionResponse
 from vigilo_billing import Meter, QuotaExceeded, consume, entitlements
 from vigilo_core.models import Tier
@@ -50,12 +51,14 @@ REGISTRY_VERSION = "0.1"
 _DENYLIST: frozenset[str] = frozenset()  # the real denylist source is Phase 6/7
 
 
-@router.post("", status_code=202, response_model=ScanSubmissionResponse)
+@router.post("", status_code=202)
 async def submit_scan(
     body: ScanSubmission,
+    request: Request,
     session: SessionDep,
     queue: QueueDep,
 ) -> ScanSubmissionResponse:
+    await enforce_scan_limits(request, body.email)
     try:
         origin = validate_target_url(body.target_url)
     except ValidationError as exc:
@@ -198,7 +201,7 @@ async def submit_scan(
     return ScanSubmissionResponse(scan_job_id=job.id, status=job.status, granted_tier=job.tier)
 
 
-@router.get("/{scan_job_id}", response_model=ScanStatusResponse)
+@router.get("/{scan_job_id}")
 async def get_scan_status(scan_job_id: uuid.UUID, session: SessionDep) -> ScanStatusResponse:
     job = await get_scan_job(session, scan_job_id)
     if job is None:

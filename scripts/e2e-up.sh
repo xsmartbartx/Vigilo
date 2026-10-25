@@ -15,6 +15,9 @@ export WEB_APP_URL="http://localhost:3000"
 # environment wins over --env-file). The specs expect the "not configured" error.
 export STRIPE_SECRET_KEY="" STRIPE_WEBHOOK_SECRET="" STRIPE_PRICE_ID_PRO="" \
   STRIPE_PRICE_ID_PRO_YEARLY="" STRIPE_PORTAL_CONFIGURATION_ID=""
+# The anonymous-scan throttle keeps hourly counters in Redis; repeated browser runs from one
+# address and email would trip it, so it is off for the test stack (the API tests cover it).
+export SCAN_RATE_PER_IP_PER_HOUR=0 SCAN_RATE_PER_EMAIL_PER_HOUR=0
 mkdir -p .e2e-logs
 nohup uv run --env-file .env uvicorn vigilo_api.main:app --port 8000 > .e2e-logs/api.log 2>&1 &
 nohup uv run --env-file .env arq vigilo_scanner.worker.WorkerSettings > .e2e-logs/worker.log 2>&1 &

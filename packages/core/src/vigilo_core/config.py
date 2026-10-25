@@ -85,6 +85,11 @@ class Config(BaseModel):
     # Optional: a specific Customer Portal configuration (bpc_...); Stripe's
     # default configuration is used when unset.
     stripe_portal_configuration_id: str | None = None
+    # Shared with NEXORA Core (its NEXORA_SYNC_SECRET): signs the plan updates Core sends
+    # for an organisation it bills. Unset = POST /v1/internal/org-plan is disabled (404).
+    nexora_sync_secret: str | None = None
+    # Where an organisation billed by Core is sent to manage its plan.
+    nexora_console_billing_url: str = "https://console.onenexora.com/billing"
 
 
 def _default_brand_config_path() -> Path:
@@ -154,4 +159,7 @@ def config() -> Config:
         stripe_price_id_pro=os.environ.get("STRIPE_PRICE_ID_PRO"),
         stripe_price_id_pro_yearly=os.environ.get("STRIPE_PRICE_ID_PRO_YEARLY"),
         stripe_portal_configuration_id=os.environ.get("STRIPE_PORTAL_CONFIGURATION_ID"),
+        nexora_sync_secret=os.environ.get("NEXORA_SYNC_SECRET") or None,
+        nexora_console_billing_url=os.environ.get("NEXORA_CONSOLE_BILLING_URL")
+        or "https://console.onenexora.com/billing",
     )

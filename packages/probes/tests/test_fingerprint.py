@@ -35,4 +35,6 @@ def test_fingerprint_detects_nextjs_from_body():
 
 def test_fingerprint_is_pure_and_deterministic():
     http = _http(headers={"server": "cloudflare"}, body="/_next/static/x.js")
-    assert fingerprint(http) == fingerprint(http)
+    first = fingerprint(http)
+    second = fingerprint(http)
+    assert first == second

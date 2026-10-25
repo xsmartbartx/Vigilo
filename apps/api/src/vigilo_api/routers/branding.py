@@ -26,7 +26,7 @@ def _to_response(profile) -> BrandingProfileResponse:
     )
 
 
-@router.put("", response_model=BrandingProfileResponse)
+@router.put("")
 async def update_branding_profile(
     body: BrandingProfileUpdate, account: AccountDep, org: ActiveOrgDep, session: SessionDep
 ) -> BrandingProfileResponse:
@@ -42,7 +42,7 @@ async def update_branding_profile(
     return _to_response(profile)
 
 
-@router.get("", response_model=BrandingProfileResponse)
+@router.get("")
 async def get_account_branding_profile(
     org: ActiveOrgDep, session: SessionDep
 ) -> BrandingProfileResponse:

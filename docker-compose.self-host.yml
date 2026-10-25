@@ -69,6 +69,8 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      args:
+        GIT_SHA: ${GIT_SHA:-unknown}
     restart: unless-stopped
     depends_on:
       postgres:
@@ -108,6 +110,10 @@ services:
       STRIPE_PRICE_ID_PRO: ${STRIPE_PRICE_ID_PRO:-}
       STRIPE_PRICE_ID_PRO_YEARLY: ${STRIPE_PRICE_ID_PRO_YEARLY:-}
       STRIPE_PORTAL_CONFIGURATION_ID: ${STRIPE_PORTAL_CONFIGURATION_ID:-}
+      # NEXORA Core signs the plan updates it sends for organisations it bills with this shared
+      # secret. Unset = POST /v1/internal/org-plan is off (404).
+      NEXORA_SYNC_SECRET: ${NEXORA_SYNC_SECRET:-}
+      NEXORA_CONSOLE_BILLING_URL: ${NEXORA_CONSOLE_BILLING_URL:-}
 
   scanner:
     build:

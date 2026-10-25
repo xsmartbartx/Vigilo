@@ -28,7 +28,7 @@ docker compose -f docker-compose.self-host.yml exec -T postgres \
 
 echo "==> Archiving the MinIO evidence volume..."
 minio_volume="$(docker volume ls --filter name=vigilo_self_host_minio_data --format '{{.Name}}' | head -n1)"
-if [ -z "$minio_volume" ]; then
+if [[ -z "$minio_volume" ]]; then
   echo "error: no volume matching vigilo_self_host_minio_data found — is the stack running?" >&2
   exit 1
 fi

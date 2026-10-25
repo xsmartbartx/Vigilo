@@ -42,7 +42,7 @@ export function LandingSections() {
       </section>
 
       <section aria-labelledby="how" className="space-y-4">
-        <h2 id="how" className="text-[28px] font-bold leading-[34px] text-nx-text">How it works</h2>
+        <h2 id="how" className="scroll-mt-24 text-[28px] font-bold leading-[34px] text-nx-text">How it works</h2>
         <ol className="grid gap-4 md:grid-cols-3">
           {STEPS.map((s, i) => (
             <li key={s.title}>
@@ -57,7 +57,7 @@ export function LandingSections() {
       </section>
 
       <section aria-labelledby="features" className="space-y-4">
-        <h2 id="features" className="text-[28px] font-bold leading-[34px] text-nx-text">What you get</h2>
+        <h2 id="features" className="scroll-mt-24 text-[28px] font-bold leading-[34px] text-nx-text">What you get</h2>
         <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (
             <li key={f.title}>
@@ -71,7 +71,7 @@ export function LandingSections() {
       </section>
 
       <section aria-labelledby="pricing" className="space-y-4">
-        <h2 id="pricing" className="text-[28px] font-bold leading-[34px] text-nx-text">Pricing</h2>
+        <h2 id="pricing" className="scroll-mt-24 text-[28px] font-bold leading-[34px] text-nx-text">Pricing</h2>
         <ul className="grid max-w-3xl gap-4 md:grid-cols-2">
           {vigilo.map((tier) => (
             <li key={tier.id}>
@@ -88,12 +88,12 @@ export function LandingSections() {
           ))}
         </ul>
         <p className="text-sm text-nx-text-muted">
-          Pay yearly for $290 instead of $348. <Link href="/pricing" className="text-nx-accent underline underline-offset-2">See every plan</Link>
+          Pay yearly for $290 instead of $348. <Link href="/pricing" className="text-nx-accent underline underline-offset-2">Compare plans</Link>
         </p>
       </section>
 
       <section aria-labelledby="faq" className="max-w-2xl space-y-4">
-        <h2 id="faq" className="text-[28px] font-bold leading-[34px] text-nx-text">Questions</h2>
+        <h2 id="faq" className="scroll-mt-24 text-[28px] font-bold leading-[34px] text-nx-text">Questions</h2>
         <dl className="space-y-4">
           {FAQ.map((item) => (
             <div key={item.q}>

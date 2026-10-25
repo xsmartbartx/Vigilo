@@ -20,6 +20,8 @@ check() { # name url expected-status [body-substring]
   echo "ok    $name"
 }
 
+commit="$(curl -s -m 10 "$API/version" | sed -n 's/.*"commit":"\([^"]*\)".*/\1/p')"
+echo "      deployed commit: ${commit:-not reported (older build)}"
 check "api health"            "$API/healthz"                       200 ok
 check "web home"              "$WEB/"                              200
 check "web pricing"           "$WEB/pricing"                       200

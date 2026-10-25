@@ -23,15 +23,17 @@ concurrency:
 
 jobs:
   smoke:
-    # Never on forks: they have no business probing this host.
-    if: github.repository == 'N3xora/Vigilo'
+    # Not on forks: they have no business probing this host. This tests the fork flag, not
+    # the owner name, which changes if the repository is renamed or transferred (that
+    # silently skipped every run once). If the flag is absent the job runs.
+    if: ${{ !github.event.repository.fork }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
       WEB_URL: https://vigilo.onenexora.com
       API_URL: https://vigilo-api.onenexora.com
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Smoke check (one retry)
         run: |
           if ! ./scripts/smoke.sh "$WEB_URL" "$API_URL"; then

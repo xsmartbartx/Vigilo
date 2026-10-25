@@ -53,7 +53,7 @@ export default async function ReportPage({
     <>
       {!printMode ? (
         <header className="flex items-center justify-between px-6 py-4 border-b border-black/10 dark:border-white/10">
-          <Link href="/products/vigilo" className="font-semibold">
+          <Link href="/" className="font-semibold">
             {brand.name}
           </Link>
           <nav className="flex items-center gap-4 text-sm">

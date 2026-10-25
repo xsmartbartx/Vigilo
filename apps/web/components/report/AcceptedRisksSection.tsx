@@ -49,7 +49,7 @@ export function AcceptedRisksSection({
       } catch {
         // Best-effort lookup only — "Restore" simply stays disabled below.
       }
-    })();
+    })().catch(() => undefined);
 
     return () => {
       cancelled = true;

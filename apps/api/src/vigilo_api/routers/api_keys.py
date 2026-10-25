@@ -37,7 +37,7 @@ def _to_response(api_key) -> ApiKeyResponse:
     )
 
 
-@router.post("", status_code=201, response_model=ApiKeyCreateResponse)
+@router.post("", status_code=201)
 async def create_account_api_key(
     body: ApiKeyCreate, account: AccountDep, org: ActiveOrgDep, session: SessionDep
 ) -> ApiKeyCreateResponse:
@@ -76,14 +76,14 @@ async def create_account_api_key(
     )
 
 
-@router.get("", response_model=list[ApiKeyResponse])
+@router.get("")
 async def list_account_api_keys(org: ActiveOrgDep, session: SessionDep) -> list[ApiKeyResponse]:
     org.require("admin")
     keys = await list_api_keys_for_org(session, org.org_id)
     return [_to_response(key) for key in keys]
 
 
-@router.post("/{api_key_id}/revoke", response_model=ApiKeyResponse)
+@router.post("/{api_key_id}/revoke")
 async def revoke_account_api_key(
     api_key_id: uuid.UUID, account: AccountDep, org: ActiveOrgDep, session: SessionDep
 ) -> ApiKeyResponse:

@@ -59,7 +59,7 @@ def _validate_cadence(cadence_hours: int, monitoring_frequency: str | None) -> N
         raise HTTPException(status_code=422, detail="cadence_hours must be between 1 and 168")
 
 
-@router.post("/v1/targets/{target_id}/monitors", status_code=201, response_model=MonitorResponse)
+@router.post("/v1/targets/{target_id}/monitors", status_code=201)
 async def create_target_monitor(
     target_id: uuid.UUID,
     body: MonitorCreate,
@@ -104,7 +104,7 @@ async def create_target_monitor(
     return _to_response(monitor)
 
 
-@router.get("/v1/targets/{target_id}/monitors", response_model=MonitorResponse)
+@router.get("/v1/targets/{target_id}/monitors")
 async def get_target_monitor(
     target_id: uuid.UUID, account: AccountDep, session: SessionDep
 ) -> MonitorResponse:
@@ -115,7 +115,7 @@ async def get_target_monitor(
     return _to_response(monitor)
 
 
-@router.post("/v1/monitors/{monitor_id}/disable", response_model=MonitorResponse)
+@router.post("/v1/monitors/{monitor_id}/disable")
 async def disable_target_monitor(
     monitor_id: uuid.UUID, account: AccountDep, session: SessionDep
 ) -> MonitorResponse:
@@ -140,7 +140,7 @@ async def disable_target_monitor(
     return _to_response(monitor)
 
 
-@router.get("/v1/targets/{target_id}/scores", response_model=list[ScoreHistoryEntry])
+@router.get("/v1/targets/{target_id}/scores")
 async def get_target_score_history(
     target_id: uuid.UUID, account: AccountDep, session: SessionDep
 ) -> list[ScoreHistoryEntry]:
@@ -158,7 +158,7 @@ async def get_target_score_history(
     ]
 
 
-@router.get("/v1/targets/{target_id}/alerts", response_model=list[AlertResponse])
+@router.get("/v1/targets/{target_id}/alerts")
 async def get_target_alerts(
     target_id: uuid.UUID, account: AccountDep, session: SessionDep
 ) -> list[AlertResponse]:

@@ -15,11 +15,13 @@ cd "$(dirname "$0")/.."
 # Compose reads COMPOSE_FILE from .env on its own (e.g. to layer in
 # docker-compose.external-proxy.yml); only fall back when it isn't set,
 # since Compose's own default would be the dev-only docker-compose.yml.
-if [ -z "${COMPOSE_FILE:-}" ] && ! grep -q '^COMPOSE_FILE=' .env 2>/dev/null; then
+if [[ -z "${COMPOSE_FILE:-}" ]] && ! grep -q '^COMPOSE_FILE=' .env 2>/dev/null; then
   export COMPOSE_FILE=docker-compose.self-host.yml
 fi
 
 git pull
+# Reported by the API's /version, so the running commit is visible from outside.
+export GIT_SHA="$(git rev-parse --short HEAD)"
 docker compose up -d --build
 docker compose exec -T api \
   uv run alembic -c packages/persistence/alembic.ini upgrade head

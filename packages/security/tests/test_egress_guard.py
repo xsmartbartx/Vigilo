@@ -135,4 +135,3 @@ def test_bad_url_grammar_is_rejected_before_any_dns_lookup(url):
 def test_no_test_in_this_module_performs_real_network_io():
     """Documents the invariant by construction: every call above passes an
     explicit `resolver=`, so `socket.getaddrinfo` is never reached."""
-    assert True

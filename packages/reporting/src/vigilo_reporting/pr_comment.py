@@ -64,10 +64,14 @@ def build_pr_comment_markdown(
     ]
 
     if failed:
-        lines.append(f"{len(failed)} failed check(s):")
-        lines.append("")
-        lines.append("| Severity | Check | Summary | |")
-        lines.append("|---|---|---|---|")
+        lines.extend(
+            [
+                f"{len(failed)} failed check(s):",
+                "",
+                "| Severity | Check | Summary | |",
+                "|---|---|---|---|",
+            ]
+        )
         lines.extend(_finding_row(f, manifests_by_check_id[f.check_id]) for f in failed)
     else:
         lines.append("No failed checks.")

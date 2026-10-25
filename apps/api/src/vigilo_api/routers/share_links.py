@@ -65,9 +65,7 @@ async def _owned_share_link_or_404(session: SessionDep, account: Account, share_
     return await org_id_for_target(session, scan.target_id)
 
 
-@router.post(
-    "/v1/scans/{scan_job_id}/share-links", status_code=201, response_model=ShareLinkCreateResponse
-)
+@router.post("/v1/scans/{scan_job_id}/share-links", status_code=201)
 async def create_scan_share_link(
     scan_job_id: uuid.UUID,
     body: ShareLinkCreate,
@@ -101,7 +99,7 @@ async def create_scan_share_link(
     )
 
 
-@router.get("/v1/scans/{scan_job_id}/share-links", response_model=list[ShareLinkResponse])
+@router.get("/v1/scans/{scan_job_id}/share-links")
 async def list_scan_share_links(
     scan_job_id: uuid.UUID, account: AccountDep, session: SessionDep
 ) -> list[ShareLinkResponse]:
@@ -124,7 +122,7 @@ async def list_scan_share_links(
     ]
 
 
-@router.post("/v1/share-links/{share_link_id}/revoke", response_model=ShareLinkRevokeResponse)
+@router.post("/v1/share-links/{share_link_id}/revoke")
 async def revoke_scan_share_link(
     share_link_id: uuid.UUID, account: AccountDep, session: SessionDep
 ) -> ShareLinkRevokeResponse:
@@ -134,7 +132,7 @@ async def revoke_scan_share_link(
     return ShareLinkRevokeResponse(share_link_id=revoked.id, revoked_at=revoked.revoked_at)
 
 
-@router.get("/v1/share/{token}", response_model=ScanReportResponse)
+@router.get("/v1/share/{token}")
 async def resolve_share(token: str, session: SessionDep) -> ScanReportResponse:
     link = await resolve_share_link(session, token)
     if link is None:

@@ -10,8 +10,8 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
       - run: uv python install 3.11
@@ -62,8 +62,8 @@ jobs:
       # pdf_renderer), but this exercises the "configured" code path.
       WEB_APP_URL: http://localhost:3000
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
       - run: uv python install 3.11
@@ -107,8 +107,8 @@ jobs:
     name: Egress guard suite (SSRF defense — build blocking)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
       - run: uv python install 3.11
@@ -124,8 +124,8 @@ jobs:
     name: Ownership verification suite (network-safety — build blocking)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
       - run: uv python install 3.11
@@ -166,8 +166,8 @@ jobs:
       OBJECT_STORE_SECRET_KEY: vigilo-dev-secret
       OBJECT_STORE_BUCKET: vigilo-evidence
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
       - run: uv python install 3.11
@@ -186,8 +186,8 @@ jobs:
     name: Regression diff suite (scan-diff classification — build blocking)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           enable-cache: true
       - run: uv python install 3.11
@@ -201,8 +201,8 @@ jobs:
       run:
         working-directory: apps/web
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: apps/web/.nvmrc
           cache: npm
@@ -225,7 +225,7 @@ jobs:
       WEB_DOMAIN: example.com
       API_DOMAIN: api.example.com
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: caddy fmt --diff
         run: docker run --rm -v "$PWD/Caddyfile:/Caddyfile:ro" caddy:2-alpine caddy fmt --diff /Caddyfile
       - name: caddy validate
@@ -247,9 +247,9 @@ jobs:
       matrix:
         image: [api, scanner, web, cli]
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/build-push-action@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           file: apps/${{ matrix.image }}/Dockerfile
@@ -302,6 +302,9 @@ jobs:
       OBJECT_STORE_SECRET_KEY: vigilo-dev-secret
       OBJECT_STORE_BUCKET: vigilo-evidence
       WEB_APP_URL: http://localhost:3000
+      # The anonymous-scan throttle is covered by the API tests; keep it out of the browser run.
+      SCAN_RATE_PER_IP_PER_HOUR: "0"
+      SCAN_RATE_PER_EMAIL_PER_HOUR: "0"
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
       NEXT_PUBLIC_CLERK_JWT_TEMPLATE: vigilo-api
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.E2E_CLERK_PUBLISHABLE_KEY }}
@@ -317,9 +320,9 @@ jobs:
             echo "configured=false" >> "$GITHUB_OUTPUT"
             echo "::warning::Browser suite skipped: add E2E_CLERK_PUBLISHABLE_KEY, E2E_CLERK_SECRET_KEY and E2E_USER_EMAIL as repository secrets (not available on fork pull requests)."
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: steps.keys.outputs.configured == 'true'
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         if: steps.keys.outputs.configured == 'true'
         with:
           enable-cache: true
@@ -327,7 +330,7 @@ jobs:
         if: steps.keys.outputs.configured == 'true'
       - run: uv sync --all-packages
         if: steps.keys.outputs.configured == 'true'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         if: steps.keys.outputs.configured == 'true'
         with:
           node-version-file: apps/web/.nvmrc
@@ -371,7 +374,7 @@ jobs:
         run: npx playwright test
       - name: Keep the evidence when it fails
         if: failure() && steps.keys.outputs.configured == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: e2e-failure
           path: |

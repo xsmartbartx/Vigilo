@@ -24,7 +24,7 @@ let reportUrl = "";
 test("S-SCAN-1 a signed-in owner scans a site and reaches a finished report", async ({ page }) => {
   test.setTimeout(180_000);
   await signIn(page);
-  await page.goto("/products/vigilo");
+  await page.goto("/");
   await page.getByLabel("Site URL").fill("https://example.com");
   await page.getByLabel(/email/i).fill(E2E_USER_EMAIL!);
   await page.getByRole("button", { name: "Scan it" }).click();

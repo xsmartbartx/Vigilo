@@ -90,7 +90,8 @@ def validate_and_pin(url: str, resolver: Resolver | None = None) -> ValidatedCon
     origin = validate_target_url(url)
     scheme, _, rest = origin.partition("://")
     host, _, port_str = rest.partition(":")
-    port = int(port_str) if port_str else (443 if scheme == "https" else 80)
+    default_port = 443 if scheme == "https" else 80
+    port = int(port_str) if port_str else default_port
 
     try:
         raw_addresses = resolve(host)

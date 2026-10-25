@@ -18,5 +18,9 @@ ENV UV_NO_DEV=1
 # `uv sync --all-packages` exactly (see this Dockerfile's top comment).
 RUN uv sync --frozen --all-packages
 
+# Last, so a new commit does not invalidate the dependency layer above. Reported by /version.
+ARG GIT_SHA=unknown
+ENV GIT_SHA=$GIT_SHA
+
 EXPOSE 8000
 CMD ["uv", "run", "uvicorn", "vigilo_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--app-dir", "apps/api/src"]

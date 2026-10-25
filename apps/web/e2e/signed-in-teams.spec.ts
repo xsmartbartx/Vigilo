@@ -30,6 +30,8 @@ const SLUG = `e2e-team-${RUN}`;
 const NAME = `E2E crew ${RUN}`;
 const MATE = `mate-${RUN}@example.test`;
 
+const NEXORA = (process.env.NEXT_PUBLIC_NEXORA_URL ?? "https://onenexora.com").replace(/\/$/, "");
+
 test("S-TEAM-1 create an organisation, then add a second member to it", async ({ page }) => {
   await signIn(page);
   await page.goto("/console/new-org");
@@ -110,10 +112,12 @@ test("S-TEAM-5 the launcher shows Vigilo as enabled and the other four as not op
   await expect(page.getByRole("button", { name: /^Enable / })).toHaveCount(0);
   await expect(page.getByText("Not open yet.")).toHaveCount(4);
 
-  // "What is planned" goes to that product's page, which says the same
-  await page.getByRole("link", { name: "What is planned" }).first().click();
-  await expect(page).toHaveURL(/\/products\/(sentinel|cspm|gateway|neurawall)$/);
-  await expect(page.getByText(/not open to organisations yet/)).toBeVisible();
+  // "What is planned" goes to that product's page on the Nexora site (this site is
+  // Vigilo's own, so it does not carry the other products' pages).
+  await expect(page.getByRole("link", { name: "What is planned" }).first()).toHaveAttribute(
+    "href",
+    new RegExp(`^${NEXORA.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/products/(sentinel|cspm|gateway|neurawall)$`),
+  );
 });
 
 test("S-TEAM-6 the owner hands a team organisation to another member", async ({ page }) => {

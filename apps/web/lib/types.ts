@@ -249,6 +249,7 @@ export interface OrgResponse {
   is_personal: boolean;
   role: "owner" | "admin" | "member" | "viewer";
   entitlements: EntitlementsResponse;
+  is_claimed?: boolean;
 }
 
 export interface OrgMemberResponse {

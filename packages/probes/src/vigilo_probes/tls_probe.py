@@ -47,7 +47,7 @@ def run_tls(host: str, pinned_ip: str, port: int) -> TlsObservation:
             protocol_version = tls_sock.version()
     except ssl.SSLCertVerificationError as exc:
         return TlsObservation(attempted=True, verified=False, verify_error=str(exc))
-    except (ssl.SSLError, OSError) as exc:
+    except OSError as exc:  # ssl.SSLError is an OSError subclass
         error = f"{type(exc).__name__}: {exc}"
         return TlsObservation(attempted=True, verified=False, verify_error=error)
 

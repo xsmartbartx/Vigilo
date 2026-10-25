@@ -26,7 +26,8 @@ def compute_next_run_at(
     now: datetime,
     jitter_minutes: int = 15,
 ) -> datetime:
-    jitter = timedelta(minutes=random.randint(-jitter_minutes, jitter_minutes))
+    # Spreads load across the cadence; not a security use of randomness.
+    jitter = timedelta(minutes=random.randint(-jitter_minutes, jitter_minutes))  # NOSONAR
     candidate = now + timedelta(hours=cadence_hours) + jitter
 
     if (

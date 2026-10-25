@@ -42,7 +42,7 @@ export function ScanSubmitForm() {
       </div>
       <div>
         <label htmlFor="email" className="block text-sm font-medium mb-1">
-          Email — we&apos;ll send the report here
+          Email — your scans are saved to this address
         </label>
         <input
           id="email"
