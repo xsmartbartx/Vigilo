@@ -10,12 +10,12 @@ export function skipUnlessSignedInTestsConfigured() {
   );
 }
 
-export async function signIn(page: Page) {
+export async function signIn(page: Page, email: string = E2E_USER_EMAIL!) {
   await setupClerkTestingToken({ page });
   // "load" waits on every third-party asset; one stalled request then fails the
   // whole test. Clerk's own helper waits for Clerk to be ready.
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await clerk.signIn({ page, emailAddress: E2E_USER_EMAIL! });
+  await clerk.signIn({ page, emailAddress: email });
 }
 
 // Collects what a person would never see but a bug would cause.
