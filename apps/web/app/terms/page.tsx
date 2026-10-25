@@ -59,8 +59,8 @@ export default function TermsOfServicePage() {
           <p>
             {brand.name} offers a free plan with limited scans and targets,
             and paid plans with higher limits and additional features.
-            Paid plans are billed by our merchant-of-record payment
-            provider on a recurring basis until canceled. Downgrading or
+            Paid plans are billed on a recurring basis through our payment
+            provider, Stripe, until canceled. Downgrading or
             canceling takes effect at the end of the current billing
             period; your account&apos;s entitlements are updated automatically
             once the change is confirmed by our billing provider.
