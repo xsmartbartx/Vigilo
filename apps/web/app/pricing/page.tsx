@@ -17,7 +17,16 @@ export default function PricingPage() {
             billing page; your plan runs to the end of the period you paid for.
           </p>
         </div>
-        <PlanTable slug="vigilo" tiers={PLANS.vigilo} />
+        <PlanTable
+          slug="vigilo"
+          tiers={PLANS.vigilo}
+          actions={{
+            free: { href: "/#scan", label: "Scan free" },
+            // Signed-out visitors are sent to sign in and come back to the billing page, where
+            // the Upgrade buttons start Stripe Checkout.
+            pro: { href: "/dashboard/billing", label: "Get Pro" },
+          }}
+        />
         <p className="text-sm text-nx-text-muted">
           Questions about a plan?{" "}
           <Link href="/#faq" className="text-nx-accent underline underline-offset-2">

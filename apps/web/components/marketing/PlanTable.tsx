@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { annualUsd, type PlanTier, type ProductSlug } from "../../lib/nexora/catalog";
 import { Card } from "../ui";
@@ -12,7 +13,18 @@ function price(slug: ProductSlug, tier: PlanTier, interval: Interval): string {
   return `$${annualUsd(slug, tier).toLocaleString("en-US")}/yr`;
 }
 
-export function PlanTable({ slug, tiers }: { slug: ProductSlug; tiers: PlanTier[] }) {
+export type PlanAction = { href: string; label: string };
+
+/** `actions` maps a tier id to the button shown under it (none: no button). */
+export function PlanTable({
+  slug,
+  tiers,
+  actions,
+}: {
+  slug: ProductSlug;
+  tiers: PlanTier[];
+  actions?: Record<string, PlanAction>;
+}) {
   const [interval, setInterval] = useState<Interval>("month");
   const options: Array<{ value: Interval; label: string }> = [
     { value: "month", label: "Monthly" },
@@ -45,6 +57,14 @@ export function PlanTable({ slug, tiers }: { slug: ProductSlug; tiers: PlanTier[
               <p className="text-lg font-semibold text-nx-text">{price(slug, tier, interval)}</p>
               <p className="text-sm text-nx-text-muted">{tier.limit}</p>
               {tier.perks && <p className="text-xs text-nx-text-muted">{tier.perks}</p>}
+              {actions?.[tier.id] && (
+                <Link
+                  href={actions[tier.id].href}
+                  className="mt-3 inline-flex h-9 items-center rounded-nx-md bg-nx-accent px-4 text-sm font-medium text-nx-on-accent hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nx-accent"
+                >
+                  {actions[tier.id].label}
+                </Link>
+              )}
             </Card>
           </li>
         ))}
