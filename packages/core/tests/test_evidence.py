@@ -156,3 +156,34 @@ def test_bundle_compute_id_changes_when_backends_field_changes():
         ),
     )
     assert id_a != id_b
+
+
+def test_bundle_ids_without_iac_evidence_ignore_the_iac_field_entirely():
+    # Ids of URL-scan bundles must not change just because IaC evidence exists as a feature.
+    import hashlib
+    import json
+
+    from vigilo_core.evidence import IacFile, IacObservation
+
+    expected_payload = {
+        "target_origin": "https://example.com",
+        "http": None,
+        "tls": None,
+        "fingerprint": None,
+        "bundle": None,
+        "wellknown": None,
+        "backends": None,
+        "paths": None,
+    }
+    canonical = json.dumps(expected_payload, sort_keys=True, separators=(",", ":"))
+    expected = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+    assert EvidenceBundle.compute_id("https://example.com", None, None, None) == expected
+    with_iac = EvidenceBundle.compute_id(
+        "https://example.com",
+        None,
+        None,
+        None,
+        iac=IacObservation(files=[IacFile(path="Dockerfile", kind="dockerfile", content="x")]),
+    )
+    assert with_iac != expected

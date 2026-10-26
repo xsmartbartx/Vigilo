@@ -152,6 +152,31 @@ class PathObservation(BaseModel):
     detected: list[DetectedPath] = Field(default_factory=list)
 
 
+class IacFile(BaseModel):
+    """One infrastructure-as-code file read from a local checkout —
+    `packages/probes.iac_probe`'s local-disk analogue of `FetchedScript`.
+    Never fetched over the network: container/IaC scanning reads a
+    repository checkout the caller already has, not a deployed URL, so
+    there is no egress guard in this path (docs/security.md's guard exists
+    specifically to bound *outbound network* requests). `content` is
+    capped the same spirit as `HttpObservation.body_excerpt` (64KB)."""
+
+    path: str
+    kind: str  # "dockerfile" | "compose" | "kubernetes"
+    content: str
+    # True when the file was longer than the probe's size cap and `content` is only its start.
+    # Checks must not report a pass for a file they could not read in full.
+    truncated: bool = False
+
+
+class IacObservation(BaseModel):
+    """Files collected for container/IaC checks (`vigilo_checks.iac`) —
+    Dockerfiles, Compose files, and Kubernetes manifests found under a
+    scanned local path."""
+
+    files: list[IacFile] = Field(default_factory=list)
+
+
 class EvidenceBundle(BaseModel):
     """The immutable, content-addressed evidence set one scan produces.
 
@@ -171,6 +196,7 @@ class EvidenceBundle(BaseModel):
     wellknown: WellKnownObservation | None = None
     backends: BackendObservation | None = None
     paths: PathObservation | None = None
+    iac: IacObservation | None = None
 
     @staticmethod
     def compute_id(
@@ -182,6 +208,7 @@ class EvidenceBundle(BaseModel):
         wellknown: WellKnownObservation | None = None,
         backends: BackendObservation | None = None,
         paths: PathObservation | None = None,
+        iac: IacObservation | None = None,
     ) -> str:
         payload = {
             "target_origin": target_origin,
@@ -193,5 +220,7 @@ class EvidenceBundle(BaseModel):
             "backends": backends.model_dump(mode="json") if backends else None,
             "paths": paths.model_dump(mode="json") if paths else None,
         }
+        if iac:  # only when present, so URL-scan bundle ids stay what they were before IaC existed
+            payload["iac"] = iac.model_dump(mode="json")
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
