@@ -41,7 +41,7 @@ prompt can act on.
 | Monitoring | Scheduled re-scans, regression alerts, score history |
 | Public API | REST + SSE, API-key authenticated, same engine as the web app |
 | MCP server | `vigilo-mcp` — lets Cursor / Claude Code start scans and pull findings in-editor |
-| CLI | `vigilo scan <url>` for CI pipelines and local use — `--sarif`/`--fail-on` for CI gating |
+| CLI | `vigilo scan <url>` for CI pipelines and local use — `--sarif`/`--fail-on` for CI gating; `vigilo scan-iac <path>` for Dockerfile/Compose/Kubernetes misconfigurations in a local checkout |
 | GitHub Action | `.github/actions/scan` — zero-account CI scan, uploads SARIF to Code Scanning |
 
 ---
@@ -206,6 +206,7 @@ uv run pytest -q                # full test suite, including all four build-bloc
                                  # your local dev data back.
 uv run ruff check .
 uv run vigilo scan https://example.com     # a real, live scan end to end, no persistence
+uv run vigilo scan-iac .                   # static container/IaC checks (VG-IAC-001..009) over local files; no network
 uv run arq vigilo_scanner.worker.WorkerSettings   # the ARQ worker (no --app-dir — every
                                                    # workspace package installs into the
                                                    # one shared .venv `uv sync` builds).

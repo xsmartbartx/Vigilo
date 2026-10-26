@@ -20,13 +20,14 @@ import argparse
 import asyncio
 import json
 import sys
+from datetime import UTC, datetime
 
-from vigilo_checks import REGISTRY
+from vigilo_checks import IAC_REGISTRY, REGISTRY, run_registry
 from vigilo_cli.pipeline import evaluate
 from vigilo_core.errors import StructuredError
 from vigilo_core.evidence import EvidenceBundle
 from vigilo_core.models import CheckManifest, Finding, Score, Verdict
-from vigilo_probes import run_probes
+from vigilo_probes import collect_iac_evidence, run_probes
 from vigilo_probes.store import LocalFileEvidenceStore
 from vigilo_reporting import build_pr_comment_markdown, build_sarif_report
 
@@ -118,6 +119,50 @@ def _cmd_scan(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_iac_human(path: str, findings: list[Finding]) -> None:
+    print(f"Vigilo IaC scan: {path}")
+    print()
+    failed = [f for f in findings if f.verdict == Verdict.FAILED]
+    if not failed:
+        print("No failed checks.")
+    else:
+        print(f"{len(failed)} finding(s):")
+        for f in sorted(failed, key=lambda x: _SEVERITY_ORDER.get(x.severity.value, 99)):
+            print(f"  [{f.severity.value.upper():>8}] {f.check_id}  {f.title}")
+            print(f"      {f.summary}")
+    not_applicable = [f for f in findings if f.verdict == Verdict.NOT_APPLICABLE]
+    if not_applicable:
+        print()
+        print(f"{len(not_applicable)} check(s) not applicable (no matching file found).")
+
+
+def _cmd_scan_iac(args: argparse.Namespace) -> int:
+    """Static container/IaC checks over a local path. Reads files from disk only: no network."""
+    bundle = EvidenceBundle(
+        bundle_id="local",
+        target_origin=f"local:{args.path}",
+        captured_at=datetime.now(UTC),
+        iac=collect_iac_evidence(args.path),
+    )
+    findings = run_registry(bundle, IAC_REGISTRY)
+
+    if args.sarif:
+        manifests_by_check_id = {c.manifest.check_id: c.manifest for c in IAC_REGISTRY}
+        _print_sarif(bundle, findings, manifests_by_check_id)
+    elif args.json:
+        payload = {
+            "target_path": args.path,
+            "findings": [json.loads(f.model_dump_json()) for f in findings],
+        }
+        print(json.dumps(payload, indent=2))
+    else:
+        _print_iac_human(args.path, findings)
+
+    if args.fail_on and _breaches_threshold(findings, args.fail_on):
+        return 1
+    return 0
+
+
 def _cmd_render_pr_comment(args: argparse.Namespace) -> int:
     """Reads the `--json-out` payload a prior `scan` run wrote and renders
     it as GitHub PR-comment markdown. A separate command rather than a
@@ -176,6 +221,29 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     scan_parser.set_defaults(func=_cmd_scan)
+
+    iac_parser = subparsers.add_parser(
+        "scan-iac", help="Scan a local checkout for container/IaC misconfigurations"
+    )
+    iac_parser.add_argument(
+        "path", help="Path to a Dockerfile, Compose file, directory, or repo checkout"
+    )
+    iac_format = iac_parser.add_mutually_exclusive_group()
+    iac_format.add_argument(
+        "--json", action="store_true", help="Print machine-readable JSON instead of a summary"
+    )
+    iac_format.add_argument(
+        "--sarif",
+        action="store_true",
+        help="Print a SARIF 2.1.0 report instead of a summary, for GitHub Code Scanning",
+    )
+    iac_parser.add_argument(
+        "--fail-on",
+        choices=list(_SEVERITY_ORDER),
+        default=None,
+        help="Exit 1 if any failed finding is at or above this severity (for CI gating)",
+    )
+    iac_parser.set_defaults(func=_cmd_scan_iac)
 
     render_comment_parser = subparsers.add_parser(
         "render-pr-comment", help="Render a prior scan's --json-out file as PR-comment markdown"

@@ -10,6 +10,7 @@ from vigilo_probes.backend_probe import run_backend_checks
 from vigilo_probes.bundle_probe import run_bundle
 from vigilo_probes.fingerprint import fingerprint
 from vigilo_probes.http_probe import TooManyRedirects, build_pinned_url, run_http
+from vigilo_probes.iac_probe import collect_iac_evidence
 from vigilo_probes.orchestrator import run_probes
 from vigilo_probes.paths_probe import run_paths
 from vigilo_probes.seal import seal
@@ -27,6 +28,7 @@ __all__ = [
     "run_backend_checks",
     "run_wellknown",
     "run_paths",
+    "collect_iac_evidence",
     "seal",
     "EvidenceStore",
     "LocalFileEvidenceStore",

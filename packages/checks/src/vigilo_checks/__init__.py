@@ -3,7 +3,7 @@
 tests/test_import_boundary.py, not just documented.
 """
 
-from vigilo_checks import cli, cmp, dat, dep, exp, hdr, leg, ses, tls
+from vigilo_checks import cli, cmp, dat, dep, exp, hdr, iac, leg, ses, tls
 from vigilo_checks.findings import plan_registry, run_registry, to_findings
 from vigilo_checks.registry import Check, CheckResult, get_header, requires
 
@@ -19,6 +19,10 @@ REGISTRY: list[Check] = [
     *dat.CHECKS,
 ]
 
+# Not folded into REGISTRY (see vigilo_checks.iac's module docstring): these need
+# EvidenceBundle.iac, which the URL-scan pipeline never populates.
+IAC_REGISTRY: list[Check] = [*iac.CHECKS]
+
 __all__ = [
     "Check",
     "CheckResult",
@@ -28,4 +32,5 @@ __all__ = [
     "plan_registry",
     "to_findings",
     "REGISTRY",
+    "IAC_REGISTRY",
 ]
