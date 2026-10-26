@@ -21,6 +21,7 @@ import asyncio
 import json
 import sys
 from datetime import UTC, datetime
+from pathlib import Path
 
 from vigilo_checks import IAC_REGISTRY, REGISTRY, run_registry
 from vigilo_cli.pipeline import evaluate
@@ -138,6 +139,11 @@ def _print_iac_human(path: str, findings: list[Finding]) -> None:
 
 def _cmd_scan_iac(args: argparse.Namespace) -> int:
     """Static container/IaC checks over a local path. Reads files from disk only: no network."""
+    if not Path(args.path).exists():
+        # A typo in CI must not look like a clean scan: every check would be "not applicable"
+        # and even --fail-on critical would exit 0.
+        print(f"vigilo: path not found: {args.path}", file=sys.stderr)
+        return 2
     bundle = EvidenceBundle(
         bundle_id="local",
         target_origin=f"local:{args.path}",

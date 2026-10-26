@@ -14,6 +14,7 @@ different — and much simpler — trust model.
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 from vigilo_core.evidence import IacFile, IacObservation
@@ -45,36 +46,49 @@ def _kind_for(path: Path) -> str | None:
     return None
 
 
+def _read_capped(path: Path) -> tuple[str, bool] | None:
+    """The first `_MAX_FILE_BYTES` of a file (decoded leniently) and whether more followed.
+    Never reads more than the cap plus one byte, whatever the file's size."""
+    try:
+        with path.open("rb") as handle:
+            raw = handle.read(_MAX_FILE_BYTES + 1)
+    except OSError:
+        return None
+    return raw[:_MAX_FILE_BYTES].decode("utf-8", errors="replace"), len(raw) > _MAX_FILE_BYTES
+
+
+def _candidates(root: Path):
+    """Files under `root` in a stable order. Skipped folders are pruned before descending, so a
+    huge `node_modules` is never walked; symlinks are never followed or read."""
+    if root.is_file():
+        yield root
+        return
+    for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
+        dirnames[:] = sorted(d for d in dirnames if d not in _SKIP_DIRS)
+        for name in sorted(filenames):
+            path = Path(dirpath) / name
+            if not path.is_symlink():
+                yield path
+
+
 def collect_iac_evidence(root: str | Path) -> IacObservation:
     root_path = Path(root)
     if not root_path.exists():
         return IacObservation()
 
-    candidates = [root_path] if root_path.is_file() else sorted(root_path.rglob("*"))
     files: list[IacFile] = []
-
-    for candidate in candidates:
+    for candidate in _candidates(root_path):
         if len(files) >= _MAX_FILES:
             break
-        if not candidate.is_file():
-            continue
-        # Only directories *inside* the scanned root are skipped: a checkout that itself lives
-        # under a folder called "build" or "dist" must still be scanned.
-        try:
-            inside_root = candidate.relative_to(root_path).parts[:-1]
-        except ValueError:
-            inside_root = ()
-        if any(part in _SKIP_DIRS for part in inside_root):
-            continue
 
         kind = _kind_for(candidate)
         if kind is None:
             continue
 
-        try:
-            content = candidate.read_text(encoding="utf-8", errors="replace")
-        except OSError:
+        read = _read_capped(candidate)
+        if read is None:
             continue
+        content, truncated = read
 
         if kind == "kubernetes_candidate":
             if "apiVersion:" not in content or "kind:" not in content:
@@ -86,6 +100,6 @@ def collect_iac_evidence(root: str | Path) -> IacObservation:
         except ValueError:
             rel_path = str(candidate)
 
-        files.append(IacFile(path=rel_path, kind=kind, content=content[:_MAX_FILE_BYTES]))
+        files.append(IacFile(path=rel_path, kind=kind, content=content, truncated=truncated))
 
     return IacObservation(files=files)

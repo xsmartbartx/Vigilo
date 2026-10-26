@@ -164,6 +164,9 @@ class IacFile(BaseModel):
     path: str
     kind: str  # "dockerfile" | "compose" | "kubernetes"
     content: str
+    # True when the file was longer than the probe's size cap and `content` is only its start.
+    # Checks must not report a pass for a file they could not read in full.
+    truncated: bool = False
 
 
 class IacObservation(BaseModel):
@@ -216,7 +219,8 @@ class EvidenceBundle(BaseModel):
             "wellknown": wellknown.model_dump(mode="json") if wellknown else None,
             "backends": backends.model_dump(mode="json") if backends else None,
             "paths": paths.model_dump(mode="json") if paths else None,
-            "iac": iac.model_dump(mode="json") if iac else None,
         }
+        if iac:  # only when present, so URL-scan bundle ids stay what they were before IaC existed
+            payload["iac"] = iac.model_dump(mode="json")
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()

@@ -67,3 +67,10 @@ def test_json_and_sarif_cannot_be_combined(tmp_path):
     with pytest.raises(SystemExit) as exc:
         run(["scan-iac", str(tmp_path), "--json", "--sarif"])
     assert exc.value.code == 2  # argparse usage error
+
+
+def test_a_missing_path_is_an_error_not_a_clean_scan(tmp_path, capsys):
+    code = _scan(str(tmp_path / "does-not-exist"), "--fail-on", "critical")
+
+    assert code == 2
+    assert "path not found" in capsys.readouterr().err

@@ -20,14 +20,12 @@ still one `VG-IAC-001` finding, naming the first offending file.
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass, replace
 
 from vigilo_checks.registry import Check, CheckResult, requires
 from vigilo_core.evidence import EvidenceBundle, IacFile
 from vigilo_core.models import CheckManifest, Confidence, Severity, Tier, Verdict
 
-_ROOT_USER_PATTERN = re.compile(r"^\s*USER\s+(root|0)\s*$", re.IGNORECASE | re.MULTILINE)
-_ANY_USER_PATTERN = re.compile(r"^\s*USER\s+\S+", re.IGNORECASE | re.MULTILINE)
-_FROM_PATTERN = re.compile(r"^\s*FROM\s+([^\s]+)(?:\s+AS\s+\S+)?\s*$", re.IGNORECASE | re.MULTILINE)
 _HARDCODED_SECRET_PATTERN = re.compile(
     r"(?:PASSWORD|SECRET|TOKEN|API_KEY|PRIVATE_KEY)\s*[:=]\s*['\"]?(?!\s*\$|\{\{)[^\s'\"$]{4,}",
     re.IGNORECASE,
@@ -47,6 +45,86 @@ def _files_of_kind(bundle: EvidenceBundle, kind: str) -> list[IacFile]:
     return [f for f in bundle.iac.files if f.kind == kind]
 
 
+def _strip_yaml_trailing_comment(line: str) -> str:
+    """Cut a ` # comment` that starts outside quotes (a `#` inside quotes is data)."""
+    quote: str | None = None
+    for i, ch in enumerate(line):
+        if quote:
+            if ch == quote:
+                quote = None
+        elif ch in "'\"":
+            quote = ch
+        elif ch == "#" and (i == 0 or line[i - 1].isspace()):
+            return line[:i]
+    return line
+
+
+def _active_text(f: IacFile) -> str:
+    """The file's *active* text: comment lines removed (and trailing YAML comments), so a
+    commented-out setting such as `# privileged: true` is never reported. Dockerfile comments are
+    whole lines only: a `#` later in an instruction belongs to the command."""
+    lines = []
+    for line in f.content.splitlines():
+        if line.lstrip().startswith("#"):
+            continue
+        lines.append(line if f.kind == "dockerfile" else _strip_yaml_trailing_comment(line))
+    return "\n".join(lines)
+
+
+@dataclass
+class _Stage:
+    base: str  # the image or earlier stage named after FROM (flags removed)
+    from_stage: bool  # `base` names an earlier stage, not an image
+    user: str | None  # effective user of this stage, None when unknown
+
+
+def _is_root(user: str) -> bool:
+    return user.split(":")[0].lower() in {"root", "0"}
+
+
+def _parse_stages(f: IacFile) -> list[_Stage]:
+    """Dockerfile stages in order, with each stage's effective user: its own last USER, else the
+    user inherited from the earlier stage it builds on, else unknown (an external base image may
+    set its own user). `USER` applies to the rest of its stage only."""
+    text = re.sub(r"\\[ \t]*\n", " ", _active_text(f))
+    stages: list[_Stage] = []
+    names: dict[str, _Stage] = {}
+    for line in text.splitlines():
+        match = re.match(r"\s*(FROM|USER)\s+(.*\S)\s*$", line, re.IGNORECASE)
+        if not match:
+            continue
+        word, rest = match.group(1).upper(), match.group(2)
+        if word == "FROM":
+            tokens = [t for t in rest.split() if not t.startswith("--")]
+            if not tokens:
+                continue
+            parent = names.get(tokens[0].lower())
+            stage = _Stage(
+                base=tokens[0],
+                from_stage=parent is not None,
+                user=parent.user if parent else None,
+            )
+            stages.append(stage)
+            if len(tokens) >= 3 and tokens[1].lower() == "as":
+                names[tokens[2].lower()] = stage
+        elif stages:
+            stages[-1].user = rest.split()[0]
+    return stages
+
+
+_TRUNCATION_KIND = {
+    "VG-IAC-001": "dockerfile",
+    "VG-IAC-002": "dockerfile",
+    "VG-IAC-003": "dockerfile",
+    "VG-IAC-004": "compose",
+    "VG-IAC-005": "compose",
+    "VG-IAC-006": "compose",
+    "VG-IAC-007": "compose",
+    "VG-IAC-008": "kubernetes",
+    "VG-IAC-009": "kubernetes",
+}
+
+
 def _first_match_check(
     kind: str,
     pattern: re.Pattern[str],
@@ -64,7 +142,7 @@ def _first_match_check(
         if not files:
             return CheckResult(Verdict.NOT_APPLICABLE, f"no {kind} files found")
         for f in files:
-            found = bool(pattern.search(f.content))
+            found = bool(pattern.search(_active_text(f)))
             if found != invert:
                 return CheckResult(Verdict.FAILED, f"{fail_detail} ({f.path})", f.path)
         return CheckResult(Verdict.PASSED, pass_detail)
@@ -80,18 +158,26 @@ def _check_no_default_root(bundle: EvidenceBundle) -> CheckResult:
     files = _files_of_kind(bundle, "dockerfile")
     if not files:
         return CheckResult(Verdict.NOT_APPLICABLE, "no Dockerfile found")
+    unknown: str | None = None
     for f in files:
-        if _ROOT_USER_PATTERN.search(f.content):
+        stages = _parse_stages(f)
+        if not stages:
+            continue
+        user = stages[-1].user  # the image that is built and run is the last stage
+        if user is not None and _is_root(user):
             return CheckResult(
-                Verdict.FAILED, f"Dockerfile sets USER root explicitly ({f.path})", f.path
+                Verdict.FAILED, f"the final stage runs as USER {user} ({f.path})", f.path
             )
-        if not _ANY_USER_PATTERN.search(f.content):
-            return CheckResult(
-                Verdict.FAILED,
-                f"Dockerfile has no USER instruction, so the container runs as root by default ({f.path})",
-                f.path,
-            )
-    return CheckResult(Verdict.PASSED, "every Dockerfile sets a non-root USER")
+        if user is None or user.startswith("$"):
+            unknown = unknown or f.path
+    if unknown:
+        return CheckResult(
+            Verdict.INCONCLUSIVE,
+            f"the final stage of {unknown} sets no USER we can resolve, so it runs as its base "
+            "image's default user, which may be root. Add an explicit non-root USER.",
+            unknown,
+        )
+    return CheckResult(Verdict.PASSED, "every Dockerfile's final stage sets a non-root USER")
 
 
 CHECK_IAC_NO_DEFAULT_ROOT = Check(
@@ -120,19 +206,27 @@ def _check_base_image_pinned(bundle: EvidenceBundle) -> CheckResult:
     files = _files_of_kind(bundle, "dockerfile")
     if not files:
         return CheckResult(Verdict.NOT_APPLICABLE, "no Dockerfile found")
+    unresolved: str | None = None
     for f in files:
-        for match in _FROM_PATTERN.finditer(f.content):
-            image = match.group(1)
-            if image.lower() == "scratch":
+        for stage in _parse_stages(f):
+            image = stage.base
+            if stage.from_stage or image.lower() == "scratch" or "@sha256:" in image:
+                continue  # an earlier stage, an empty base, or a digest: nothing to pin
+            if "$" in image:
+                unresolved = unresolved or f.path  # an ARG-built name we cannot resolve
                 continue
-            if "@sha256:" in image:
-                continue
-            if ":" not in image.split("/")[-1] or image.endswith(":latest"):
+            if ":" not in image.split("/")[-1] or image.lower().endswith(":latest"):
                 return CheckResult(
                     Verdict.FAILED,
                     f"base image `{image}` is unpinned (no tag, or `:latest`) in {f.path}",
                     f.path,
                 )
+    if unresolved:
+        return CheckResult(
+            Verdict.INCONCLUSIVE,
+            f"a base image in {unresolved} is set through a build argument, so its tag is unknown",
+            unresolved,
+        )
     return CheckResult(Verdict.PASSED, "every base image is pinned to a specific tag or digest")
 
 
@@ -350,14 +444,38 @@ CHECK_IAC_K8S_NO_RUN_AS_ROOT = Check(
 )
 
 
+def _guard_truncation(check: Check) -> Check:
+    """A pass over a file we only read the start of is not a pass: it becomes inconclusive."""
+    kind = _TRUNCATION_KIND[check.manifest.check_id]
+    inner = check.evaluate
+
+    def evaluate(bundle: EvidenceBundle) -> CheckResult:
+        result = inner(bundle)
+        if result.verdict == Verdict.PASSED:
+            cut = [f.path for f in _files_of_kind(bundle, kind) if f.truncated]
+            if cut:
+                return CheckResult(
+                    Verdict.INCONCLUSIVE,
+                    f"{cut[0]} is larger than the scan limit and was only read in part, so a "
+                    "setting past the cut-off would not have been seen",
+                    cut[0],
+                )
+        return result
+
+    return replace(check, evaluate=evaluate)
+
+
 CHECKS: list[Check] = [
-    CHECK_IAC_NO_DEFAULT_ROOT,
-    CHECK_IAC_BASE_IMAGE_PINNED,
-    CHECK_IAC_NO_DOCKERFILE_SECRET,
-    CHECK_IAC_COMPOSE_NOT_PRIVILEGED,
-    CHECK_IAC_NO_DOCKER_SOCKET_MOUNT,
-    CHECK_IAC_NO_COMPOSE_SECRET,
-    CHECK_IAC_NO_HOST_NETWORK,
-    CHECK_IAC_K8S_NO_PRIVILEGE_ESCALATION,
-    CHECK_IAC_K8S_NO_RUN_AS_ROOT,
+    _guard_truncation(check)
+    for check in [
+        CHECK_IAC_NO_DEFAULT_ROOT,
+        CHECK_IAC_BASE_IMAGE_PINNED,
+        CHECK_IAC_NO_DOCKERFILE_SECRET,
+        CHECK_IAC_COMPOSE_NOT_PRIVILEGED,
+        CHECK_IAC_NO_DOCKER_SOCKET_MOUNT,
+        CHECK_IAC_NO_COMPOSE_SECRET,
+        CHECK_IAC_NO_HOST_NETWORK,
+        CHECK_IAC_K8S_NO_PRIVILEGE_ESCALATION,
+        CHECK_IAC_K8S_NO_RUN_AS_ROOT,
+    ]
 ]

@@ -58,8 +58,29 @@ def test_a_single_file_path_works_and_a_missing_path_is_empty(tmp_path):
     assert collect_iac_evidence(tmp_path / "nope").files == []
 
 
-def test_content_is_capped(tmp_path):
+def test_content_is_capped_and_marked_truncated(tmp_path):
     (tmp_path / "Dockerfile").write_text("# " + "x" * 200_000 + "\n")
+    (tmp_path / "small").mkdir()
+    (tmp_path / "small" / "Dockerfile").write_text("FROM scratch\n")
 
-    (only,) = collect_iac_evidence(tmp_path).files
-    assert len(only.content) == 64 * 1024
+    files = {f.path: f for f in collect_iac_evidence(tmp_path).files}
+    assert len(files["Dockerfile"].content) == 64 * 1024
+    assert files["Dockerfile"].truncated is True
+    assert files["small/Dockerfile"].truncated is False
+
+
+def test_discovery_stops_at_the_file_limit(tmp_path):
+    for i in range(250):
+        (tmp_path / f"Dockerfile.{i:03d}").write_text("FROM scratch\n")
+
+    assert len(collect_iac_evidence(tmp_path).files) == 200
+
+
+def test_symlinks_are_never_read(tmp_path):
+    secret = tmp_path / "outside.txt"
+    secret.write_text("FROM scratch\n")
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "Dockerfile").symlink_to(secret)
+
+    assert collect_iac_evidence(project).files == []
