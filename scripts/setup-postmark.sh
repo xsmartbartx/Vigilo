@@ -34,7 +34,7 @@ if [[ ! "$from" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; then
 fi
 
 # 1. The token goes to a private, uniquely named file (mktemp, mode 0600), removed on every exit.
-remote_key="$(printf '%s' "$token" | "${ssh_cmd[@]}" 'f="$(mktemp /tmp/.postmark_token.XXXXXXXX)" && cat > "$f" && printf "%s" "$f"')"
+remote_key="$(printf '%s' "$token" | "${ssh_cmd[@]}" 'f="$(mktemp /tmp/.postmark_token.XXXXXXXX)" || exit 1; if cat > "$f"; then printf "%s" "$f"; else rm -f -- "$f"; exit 1; fi')"
 unset token
 if [[ ! "$remote_key" =~ ^/tmp/\.postmark_token\.[A-Za-z0-9]+$ ]]; then
   echo "Could not create a private temp file on the server. Nothing changed." >&2
@@ -86,10 +86,18 @@ remote_key=""
   cd /opt/vigilo &&
   sudo env GIT_SHA="$(git rev-parse --short HEAD)" docker compose up -d --force-recreate --no-deps api scanner'
 echo "Waiting for the API to come up..."
+healthy=0
 for _ in $(seq 1 30); do
-  curl -fsS -o /dev/null https://vigilo-api.onenexora.com/healthz && break
+  if curl -fsS --max-time 5 -o /dev/null https://vigilo-api.onenexora.com/healthz; then
+    healthy=1
+    break
+  fi
   sleep 3
 done
+if [[ "$healthy" != 1 ]]; then
+  echo "The API did not become healthy after the restart. The token is saved; check the api container's logs." >&2
+  exit 1
+fi
 
 # 4. One real message through Vigilo's own sender, so token, sender address and domain are proven.
 echo "Sending a test email to $recipient ..."
