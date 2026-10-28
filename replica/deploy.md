@@ -139,3 +139,10 @@ After the deploy an unsigned call must answer 401 (what Nexora's own smoke test 
 1. Clerk dashboard, JWT templates, `vigilo-api`: add the claims `"org_id": "{{org.id}}"`, `"org_role": "{{org.role}}"`, `"org_name": "{{org.name}}"` (they are absent when no organisation is active, which is the personal-workspace case).
 2. Migrate (adds table `core_org_plans`; nothing else changes): `ssh ... "cd /opt/vigilo && sudo docker compose exec api uv run alembic -c packages/persistence/alembic.ini upgrade head"`, then deploy.
 3. Rollback: remove the claims from the template and nothing links; the table is harmless.
+
+### Email through Postmark (2026-10-28)
+Prerequisites (done in the Postmark and Squarespace dashboards, by the account owner): a Postmark Server, `onenexora.com` verified as a sender domain (its DKIM and Return-Path records added in DNS; Google's MX and SPF untouched). Then, from a local terminal:
+
+    ./scripts/setup-postmark.sh            # hidden prompt for the Server API token; asks for the From address
+
+It writes `POSTMARK_SERVER_TOKEN` and `MAIL_FROM_ADDRESS` to `/opt/vigilo/.env` (backup `.env.bak-pre-postmark-*`, atomic), recreates `api` (invitations) and `scanner` (alert notifications), and sends a test message to `support@onenexora.com`. Rollback: restore the backup file and recreate the two services; with no token set the app degrades to "email not sent". A new Postmark account may only send to its own domain until Postmark approves it for general sending.

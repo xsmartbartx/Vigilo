@@ -34,7 +34,7 @@ fi
 
 # 1. The key goes to a private, uniquely named file created by mktemp (mode 0600, never
 #    reused); its path comes back so it can be read once and removed on every exit path.
-remote_key="$(printf '%s' "$key" | "${ssh_cmd[@]}" 'f="$(mktemp /tmp/.stripe_key.XXXXXXXX)" && cat > "$f" && printf "%s" "$f"')"
+remote_key="$(printf '%s' "$key" | "${ssh_cmd[@]}" 'f="$(mktemp /tmp/.stripe_key.XXXXXXXX)" || exit 1; if cat > "$f"; then printf "%s" "$f"; else rm -f -- "$f"; exit 1; fi')"
 unset key
 if [[ ! "$remote_key" =~ ^/tmp/\.stripe_key\.[A-Za-z0-9]+$ ]]; then
   echo "Could not create a private temp file on the server. Nothing changed." >&2
