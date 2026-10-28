@@ -37,9 +37,11 @@ export default function PrivacyPolicyPage() {
           <ul className="list-disc pl-6 space-y-1">
             <li>
               <strong>Email address</strong> — required to submit a scan or
-              create an account, used to identify your account. Scan results
-              are shown in the report on screen; we do not currently email
-              them.
+              create an account, used to identify your account and to send you
+              the transactional emails described below: a summary when a scan
+              you requested finishes, alerts from monitoring you have set up,
+              and organisation invitations. The full report is shown on screen.
+              We do not send marketing email.
             </li>
             <li>
               <strong>Account and authentication data</strong> — if you sign
@@ -96,10 +98,10 @@ export default function PrivacyPolicyPage() {
           <p>
             When an organisation owner or admin invites someone, we store the
             invited email address, the role offered and the inviter until the
-            invitation is accepted, withdrawn or replaced. We do not currently
-            email invitations: the person who invited you passes you a link.
-            If you were not expecting one, ignore it: nothing happens unless
-            you accept.
+            invitation is accepted, withdrawn or replaced. We email the invited
+            address a one-time link (the inviter also sees the link), through
+            our email provider. If you were not expecting one, ignore it:
+            nothing happens unless you accept.
           </p>
         </section>
 
@@ -108,13 +110,13 @@ export default function PrivacyPolicyPage() {
           <p>
             We use a small number of subprocessors to run the service:
             our cloud hosting and database provider, our authentication
-            provider (Clerk), our payment provider (Stripe), and
+            provider (Clerk), our payment provider (Stripe), our email provider
+            (Postmark), which delivers the transactional emails described above
+            and so receives the recipient address and the message content, and
             an LLM provider used to generate plain-language remediation
             guidance for findings. Data sent to the LLM provider is limited
             to already-redacted finding summaries — never raw evidence or
-            account credentials. We do not currently use an email provider; if
-            that changes we will update this policy before sending any email.
-            We do not sell your data.
+            account credentials. We do not sell your data.
           </p>
         </section>
 
