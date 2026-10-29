@@ -122,3 +122,26 @@ test("F01-H9 trust page lists practices and is accessible", async ({ page }) => 
   await expect(page.getByRole("link", { name: "Trust and security" })).toBeVisible();
   expect(problems).toEqual([]);
 });
+
+test("F01-H10 the scan form accepts a bare domain and explains a non-address", async ({ page }) => {
+  let sent: string | null = null;
+  // The request is captured and dropped: nothing is submitted to the API.
+  await page.route("**/v1/scans**", async (route) => {
+    sent = route.request().postData();
+    await route.abort();
+  });
+  await page.goto("/");
+  const url = page.getByLabel("Site URL").first();
+  const email = page.getByLabel(/^Email/).first();
+  const submit = page.getByRole("button", { name: "Scan it" }).first();
+
+  await url.fill("not an address");
+  await email.fill("review@example.com");
+  await submit.click();
+  await expect(page.getByText("Enter a website address")).toBeVisible();
+  expect(sent).toBeNull();
+
+  await url.fill("example.com/path");
+  await submit.click();
+  await expect.poll(() => sent).toContain("https://example.com/path");
+});
