@@ -151,3 +151,10 @@ test("F01-H11 the sign-up page links the terms and the privacy policy", async ({
   await expect(page.getByRole("link", { name: "Terms of Service" })).toHaveAttribute("href", "/terms");
   await expect(page.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute("href", "/privacy");
 });
+
+test("F01-H12 sign-in and sign-up say whose they are and link back to the site", async ({ page }) => {
+  for (const path of ["/sign-in", "/sign-up"]) {
+    await page.goto(path);
+    await expect(page.getByRole("link", { name: /Back to Vigilo/ })).toHaveAttribute("href", "/");
+  }
+});
