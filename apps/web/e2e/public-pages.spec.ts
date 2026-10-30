@@ -145,3 +145,9 @@ test("F01-H10 the scan form accepts a bare domain and explains a non-address", a
   await submit.click();
   await expect.poll(() => sent).toContain("https://example.com/path");
 });
+
+test("F01-H11 the sign-up page links the terms and the privacy policy", async ({ page }) => {
+  await page.goto("/sign-up");
+  await expect(page.getByRole("link", { name: "Terms of Service" })).toHaveAttribute("href", "/terms");
+  await expect(page.getByRole("link", { name: "Privacy Policy" })).toHaveAttribute("href", "/privacy");
+});
