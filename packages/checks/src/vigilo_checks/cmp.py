@@ -61,7 +61,7 @@ CHECK_TRACKER_WITHOUT_CONSENT_LIBRARY = Check(
         tier_required=Tier.PASSIVE,
         references=["https://gdpr.eu/cookies/"],
         remediation_template="Gate analytics/ad-tech script loading behind an explicit consent banner (or add a recognized CMP if one already exists but isn't detected).",
-        false_positive_notes="Matches a fixed list of common tracker and CMP library signatures in the first 8KB of the homepage — a custom-built consent solution, or a CMP that defers script injection via a mechanism this regex can't see, will misfire as a failure.",
+        false_positive_notes="Matches a fixed list of common tracker and CMP library signatures in the first 256KB of the homepage — a custom-built consent solution, or a CMP that defers script injection via a mechanism this regex can't see, will misfire as a failure.",
         introduced_in="0.1",
     cwe_id="CWE-359",
 ),

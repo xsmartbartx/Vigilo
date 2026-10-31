@@ -196,7 +196,7 @@ CHECK_NO_MIXED_CONTENT = Check(
         tier_required=Tier.PASSIVE,
         references=["https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content"],
         remediation_template="Change every http:// resource reference to https:// (or a protocol-relative/relative URL).",
-        false_positive_notes="This is a regex over the first 8KB of the HTML body only — resources referenced from JS or below that cutoff are not seen.",
+        false_positive_notes="This is a regex over the first 256KB of the HTML body only — resources referenced from JS or below that cutoff are not seen.",
         introduced_in="0.1",
     cwe_id="CWE-319",
 ),

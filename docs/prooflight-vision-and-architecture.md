@@ -501,7 +501,7 @@ flowchart TD
 - **Validate target URL** — grammar rules in §16.1. Reject non-HTTP schemes, userinfo, fragments, ports outside `{80, 443, 8080, 8443}`, and hostnames that are raw IPs (v1).
 - **Fingerprint** — identify framework, hosting platform, database backend and bundler from response signatures. Fingerprint selects the check subset; a target with no client bundle skips `CLI` checks entirely. This is where "tuned for AI-generated stacks" is actually implemented.
 - **Probe plan** — a deterministic ordered list of requests derived from `(fingerprint, tier, registry_version)`. The plan is stored with the scan so a scan is reproducible.
-- **Evidence capture** — request line, selected headers, and a bounded response excerpt (suggested cap: 8 KB). Redaction (§9.2) runs *before* persistence, not before display.
+- **Evidence capture** — request line, selected headers, and a bounded response excerpt (cap: 256 KB; it was 8 KB, which hid footer links and late scripts on real pages). Redaction (§9.2) runs *before* persistence, not before display.
 - **Normalise** — probes emit raw observations; a separate mapping step turns observations into findings. Multiple checks may consume one observation; one request should never be sent twice.
 
 ### 8.3 Concurrency and politeness

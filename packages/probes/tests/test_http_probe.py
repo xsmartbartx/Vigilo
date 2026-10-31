@@ -18,7 +18,19 @@ _FAKE_DNS: dict[str, list[str]] = {
     "redirect-no-location.test": ["93.184.216.34"],
     "internal-redirect.test": ["93.184.216.34"],
     "internal.test": ["169.254.1.1"],
+    "long-page.test": ["93.184.216.34"],
+    "huge-page.test": ["93.184.216.34"],
 }
+
+# A realistic page: a large inline payload first, then the footer with the legal links.
+_LONG_PAGE = (
+    b"<html><body>"
+    + b"<script>window.__data="
+    + b"x" * 60_000
+    + b"</script>"
+    + b'<footer><a href="/privacy">Privacy</a> <a href="/terms">Terms</a></footer>'
+    + b"</body></html>"
+)
 
 
 def _fake_resolver(hostname: str) -> list[str]:
@@ -39,6 +51,12 @@ def _handler(request: httpx.Request) -> httpx.Response:
                 ("set-cookie", "tracking=xyz"),
             ],
             content=b"<html>hello</html>",
+        )
+    if host == "long-page.test":
+        return httpx.Response(200, headers=[("content-type", "text/html")], content=_LONG_PAGE)
+    if host == "huge-page.test":
+        return httpx.Response(
+            200, headers=[("content-type", "text/html")], content=b"<p>" + b"y" * 600_000
         )
     if host == "redirect-once.test":
         return httpx.Response(302, headers=[("location", "https://redirect-target.test/")])
@@ -104,3 +122,20 @@ async def test_redirect_into_internal_space_is_denied():
         await run_http(
             "https://internal-redirect.test", resolver=_fake_resolver, transport=_client()
         )
+
+
+async def test_footer_links_far_down_the_page_are_kept_for_the_checks():
+    # Regression: the excerpt used to stop at 8 KB, so the legal-link checks reported "no privacy
+    # policy link" for sites whose footer sits below that (Vigilo's own home page did).
+    obs = await run_http("https://long-page.test", resolver=_fake_resolver, transport=_client())
+
+    assert obs.body_size > 60_000
+    assert 'href="/privacy"' in obs.body_excerpt
+    assert 'href="/terms"' in obs.body_excerpt
+
+
+async def test_the_excerpt_is_still_bounded_for_very_large_pages():
+    obs = await run_http("https://huge-page.test", resolver=_fake_resolver, transport=_client())
+
+    assert obs.body_size == 600_003
+    assert len(obs.body_excerpt) == 256 * 1024
