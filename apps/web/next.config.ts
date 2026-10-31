@@ -19,9 +19,11 @@ function clerkHost(): string | null {
   }
 }
 
+// The browser calls the API directly (lib/api.ts), so its origin must be allowed in connect-src.
+// Same variable and default as lib/api.ts.
 function apiOrigin(): string | null {
   try {
-    return new URL(process.env.NEXT_PUBLIC_API_URL ?? "").origin;
+    return new URL(process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000").origin;
   } catch {
     return null;
   }
@@ -37,7 +39,8 @@ function contentSecurityPolicy(): string {
     "default-src 'self'",
     ["script-src 'self' 'unsafe-inline'", ...clerkOrigin, "https://challenges.cloudflare.com"].join(" "),
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https://img.clerk.com",
+    // The API origin serves the score badge image (components/monitoring/BadgeEmbed.tsx).
+    ["img-src 'self' data: blob: https://img.clerk.com", ...(api ? [api] : [])].join(" "),
     "font-src 'self' data:",
     ["connect-src 'self'", ...clerkOrigin, ...(api ? [api] : [])].join(" "),
     "frame-src https://challenges.cloudflare.com",
@@ -49,7 +52,7 @@ function contentSecurityPolicy(): string {
   ].join("; ");
 }
 
-const CSP_HEADER = "Content-Security-Policy-Report-Only";
+const CSP_HEADER = "Content-Security-Policy";
 
 const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
@@ -60,9 +63,8 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
   },
-  // Report-only first: it logs violations in the browser console without blocking anything, so the
-  // policy can be checked against the real sign-in flow before it is enforced (then this key
-  // becomes "Content-Security-Policy"). Production only: the dev server needs `eval`.
+  // Enforced. To debug a violation, temporarily use "Content-Security-Policy-Report-Only" for
+  // CSP_HEADER: it logs to the console without blocking. Production only: the dev server needs `eval`.
   ...(process.env.NODE_ENV === "production"
     ? [{ key: CSP_HEADER, value: contentSecurityPolicy() }]
     : []),
