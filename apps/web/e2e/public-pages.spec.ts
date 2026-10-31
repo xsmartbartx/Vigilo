@@ -158,3 +158,14 @@ test("F01-H12 sign-in and sign-up say whose they are and link back to the site",
     await expect(page.getByRole("link", { name: /Back to Vigilo/ })).toHaveAttribute("href", "/");
   }
 });
+
+test("F01-H13 pages send the security headers and do not name the framework", async ({ request }) => {
+  const res = await request.get("/");
+  const h = res.headers();
+  expect(h["strict-transport-security"]).toContain("max-age=");
+  expect(h["x-content-type-options"]).toBe("nosniff");
+  expect(h["x-frame-options"]).toBe("DENY");
+  expect(h["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+  expect(h["permissions-policy"]).toContain("camera=()");
+  expect(h["x-powered-by"]).toBeUndefined();
+});
