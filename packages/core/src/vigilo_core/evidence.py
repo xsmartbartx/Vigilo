@@ -30,7 +30,7 @@ class CookieObservation(BaseModel):
 
 
 class HttpObservation(BaseModel):
-    """One HTTP probe's result. `body_excerpt` is capped at 8KB per
+    """One HTTP probe's result. `body_excerpt` is capped at 256KB per
     docs/prooflight-vision-and-architecture.md §8.2."""
 
     url: str

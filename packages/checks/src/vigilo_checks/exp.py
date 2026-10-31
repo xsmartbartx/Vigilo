@@ -179,7 +179,7 @@ CHECK_NO_VERBOSE_ERROR_PAGE = Check(
         tier_required=Tier.PASSIVE,
         references=["https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration"],
         remediation_template="Disable debug mode in production and configure a generic error page for unhandled exceptions.",
-        false_positive_notes="Matches distinctive framework debug-page and stack-trace signatures (Django, Flask/Werkzeug, PHP, Rails, ASP.NET, raw Node stack frames) within the first 8KB of the homepage body only.",
+        false_positive_notes="Matches distinctive framework debug-page and stack-trace signatures (Django, Flask/Werkzeug, PHP, Rails, ASP.NET, raw Node stack frames) within the first 256KB of the homepage body only.",
         introduced_in="0.1",
     cwe_id="CWE-209",
 ),

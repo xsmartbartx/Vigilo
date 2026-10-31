@@ -26,7 +26,12 @@ from vigilo_security.egress_guard import (
 )
 
 _MAX_REDIRECTS = 5
-_BODY_EXCERPT_CAP = 8 * 1024
+# How much of the page the checks get to read. It must cover the whole HTML document of a typical
+# site: footer links (privacy, terms, cookies, contact), late <script> tags and consent banners
+# sit far below the top. With 8 KB the legal-link checks reported "no privacy policy link" for
+# sites that had one (Vigilo's own home page, whose footer starts at about 16 KB). The download
+# itself is capped separately at 2 MB.
+_BODY_EXCERPT_CAP = 256 * 1024
 _MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024
 _REQUEST_TIMEOUT = 15.0
 _USER_AGENT = "VigiloScanner/0.1 (+https://vigilo.onenexora.com/aup)"

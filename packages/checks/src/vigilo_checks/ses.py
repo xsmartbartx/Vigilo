@@ -179,7 +179,7 @@ CHECK_NO_SESSION_ID_IN_URL = Check(
         tier_required=Tier.PASSIVE,
         references=["https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html"],
         remediation_template="Move session identifiers out of the URL and into a cookie or an Authorization header.",
-        false_positive_notes="A regex over the first 8KB of the homepage body only, matching a fixed list of common session-parameter names.",
+        false_positive_notes="A regex over the first 256KB of the homepage body only, matching a fixed list of common session-parameter names.",
         introduced_in="0.1",
     cwe_id="CWE-598",
 ),

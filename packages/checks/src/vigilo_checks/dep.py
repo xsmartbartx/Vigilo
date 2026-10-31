@@ -68,7 +68,7 @@ CHECK_SRI_PRESENT = Check(
         tier_required=Tier.PASSIVE,
         references=["https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity"],
         remediation_template="Add an `integrity=\"sha384-...\"` attribute (and `crossorigin=\"anonymous\"`) to every cross-origin `<script>` tag.",
-        false_positive_notes="Only scans the first 8KB of the homepage's HTML; scripts injected dynamically by other JS are not seen.",
+        false_positive_notes="Only scans the first 256KB of the homepage's HTML; scripts injected dynamically by other JS are not seen.",
         introduced_in="0.1",
     cwe_id="CWE-353",
 ),
