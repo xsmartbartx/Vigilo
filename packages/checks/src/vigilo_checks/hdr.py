@@ -191,7 +191,10 @@ def _csp_no_unsafe_inline(bundle: EvidenceBundle) -> CheckResult:
 
     directives = _parse_csp(value)
     relevant = directives.get("script-src") or directives.get("default-src") or []
-    if any("unsafe-inline" in token for token in relevant):
+    # CSP Level 3: a nonce or hash source in the same directive makes browsers ignore
+    # 'unsafe-inline', so listing it next to one is a fallback for old browsers, not a hole.
+    neutralised = any(t.lower().startswith(("'nonce-", "'sha256-", "'sha384-", "'sha512-")) for t in relevant)
+    if not neutralised and any("unsafe-inline" in token for token in relevant):
         return CheckResult(Verdict.FAILED, "CSP allows 'unsafe-inline' script execution", value)
     return CheckResult(Verdict.PASSED, "CSP does not allow unsafe-inline scripts")
 
@@ -208,7 +211,7 @@ CHECK_CSP_NO_UNSAFE_INLINE = Check(
         tier_required=Tier.PASSIVE,
         references=["https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/script-src"],
         remediation_template="Remove 'unsafe-inline' from script-src/default-src; use nonces or hashes for any inline scripts you need.",
-        false_positive_notes="A CSP that relies entirely on 'strict-dynamic' with nonces may still list 'unsafe-inline' as a fallback for old browsers, which is intentional and not a real weakness.",
+        false_positive_notes="A CSP that pairs 'unsafe-inline' with a nonce or hash source in the same directive is not flagged: browsers that support CSP Level 3 ignore 'unsafe-inline' there, so it is only a fallback for old browsers.",
         introduced_in="0.1",
     cwe_id="CWE-693",
 ),
