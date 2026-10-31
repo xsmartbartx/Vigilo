@@ -70,6 +70,17 @@ def test_csp_no_unsafe_inline():
     assert _v(hdr.CHECK_CSP_NO_UNSAFE_INLINE, no_header) == Verdict.INCONCLUSIVE
 
 
+def test_csp_unsafe_inline_beside_a_nonce_or_hash_is_ignored_by_browsers():
+    nonce = _http({"content-security-policy": "script-src 'self' 'unsafe-inline' 'nonce-abc123' 'strict-dynamic'"})
+    hashed = _http({"content-security-policy": "script-src 'unsafe-inline' 'sha256-AAAA='"})
+    # A nonce in a different directive does not neutralise it.
+    other = _http({"content-security-policy": "script-src 'self' 'unsafe-inline'; style-src 'nonce-abc123'"})
+
+    assert _v(hdr.CHECK_CSP_NO_UNSAFE_INLINE, nonce) == Verdict.PASSED
+    assert _v(hdr.CHECK_CSP_NO_UNSAFE_INLINE, hashed) == Verdict.PASSED
+    assert _v(hdr.CHECK_CSP_NO_UNSAFE_INLINE, other) == Verdict.FAILED
+
+
 def test_x_content_type_options():
     assert _v(hdr.CHECK_X_CONTENT_TYPE_OPTIONS, _http({"x-content-type-options": "nosniff"})) == Verdict.PASSED
     assert _v(hdr.CHECK_X_CONTENT_TYPE_OPTIONS, _http({"x-content-type-options": "sniff-away"})) == Verdict.FAILED
