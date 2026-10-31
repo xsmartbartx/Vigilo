@@ -54,7 +54,8 @@ const clerkLocalization = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <ClerkProvider localization={clerkLocalization}>
+    // `dynamic`: every page is rendered per request so Clerk's scripts get the CSP nonce from proxy.ts.
+    <ClerkProvider dynamic localization={clerkLocalization}>
       <html
         lang="en"
         className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}

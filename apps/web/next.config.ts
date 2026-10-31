@@ -5,55 +5,6 @@ import type { NextConfig } from "next";
 // catalogue of all products and the other products' pages are on the Nexora site.
 const NEXORA = (process.env.NEXT_PUBLIC_NEXORA_URL ?? "https://onenexora.com").replace(/\/$/, "");
 
-// Clerk's frontend API host is encoded in the publishable key (pk_live_<base64 of "host$">), so the
-// policy follows whichever Clerk instance this deployment uses instead of hard-coding one.
-function clerkHost(): string | null {
-  const key = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "";
-  const encoded = key.split("_").slice(2).join("_");
-  if (!encoded) return null;
-  try {
-    const host = Buffer.from(encoded, "base64").toString("utf8").replace(/\$$/, "");
-    return /^[a-z0-9.-]+$/i.test(host) ? host : null;
-  } catch {
-    return null;
-  }
-}
-
-// The browser calls the API directly (lib/api.ts), so its origin must be allowed in connect-src.
-// Same variable and default as lib/api.ts.
-function apiOrigin(): string | null {
-  try {
-    return new URL(process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000").origin;
-  } catch {
-    return null;
-  }
-}
-
-// What the pages are allowed to load. 'unsafe-inline' scripts and styles are needed by Next's own
-// inline bootstrap and Clerk's widget until nonces are wired in; everything else is closed.
-function contentSecurityPolicy(): string {
-  const clerk = clerkHost();
-  const clerkOrigin = clerk ? [`https://${clerk}`] : [];
-  const api = apiOrigin();
-  return [
-    "default-src 'self'",
-    ["script-src 'self' 'unsafe-inline'", ...clerkOrigin, "https://challenges.cloudflare.com"].join(" "),
-    "style-src 'self' 'unsafe-inline'",
-    // The API origin serves the score badge image (components/monitoring/BadgeEmbed.tsx).
-    ["img-src 'self' data: blob: https://img.clerk.com", ...(api ? [api] : [])].join(" "),
-    "font-src 'self' data:",
-    ["connect-src 'self'", ...clerkOrigin, ...(api ? [api] : [])].join(" "),
-    "frame-src https://challenges.cloudflare.com",
-    "worker-src 'self' blob:",
-    "object-src 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "frame-ancestors 'none'",
-  ].join("; ");
-}
-
-const CSP_HEADER = "Content-Security-Policy";
-
 const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -63,11 +14,7 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
   },
-  // Enforced. To debug a violation, temporarily use "Content-Security-Policy-Report-Only" for
-  // CSP_HEADER: it logs to the console without blocking. Production only: the dev server needs `eval`.
-  ...(process.env.NODE_ENV === "production"
-    ? [{ key: CSP_HEADER, value: contentSecurityPolicy() }]
-    : []),
+  // The Content-Security-Policy is set per request in proxy.ts (it carries a nonce).
 ];
 
 const nextConfig: NextConfig = {
