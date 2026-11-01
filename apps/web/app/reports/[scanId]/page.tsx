@@ -9,6 +9,26 @@ import { brand } from "../../../lib/brand";
 
 const JWT_TEMPLATE = process.env.NEXT_PUBLIC_CLERK_JWT_TEMPLATE ?? "vigilo-api";
 
+function ReportHeader() {
+  return (
+    <header className="flex items-center justify-between px-6 py-4 border-b border-black/10 dark:border-white/10">
+      <Link href="/" className="font-semibold">
+        {brand.name}
+      </Link>
+      <nav className="flex items-center gap-4 text-sm">
+        <Show when="signed-out">
+          <Link href="/sign-in" className="inline-flex min-h-8 items-center">
+            Sign in
+          </Link>
+        </Show>
+        <Show when="signed-in">
+          <UserButton />
+        </Show>
+      </nav>
+    </header>
+  );
+}
+
 export default async function ReportPage({
   params,
   searchParams,
@@ -32,15 +52,22 @@ export default async function ReportPage({
     }
     if (err instanceof ApiError && err.status === 409) {
       return (
-        <main className="mx-auto max-w-md px-6 py-16 text-center">
-          <AutoRefresh />
-          <p role="status" className="text-lg font-medium">
-            Still scanning…
-          </p>
-          <p className="mt-2 text-sm text-black/60 dark:text-white/60">
-            This report isn&apos;t ready yet. This page updates by itself.
-          </p>
-        </main>
+        <>
+          <ReportHeader />
+          <main className="mx-auto max-w-md px-6 py-16 text-center">
+            <span
+              aria-hidden="true"
+              className="mx-auto mb-4 block h-3 w-3 rounded-full bg-brand-accent motion-safe:animate-pulse"
+            />
+            <p role="status" className="text-lg font-medium">
+              Still scanning…
+            </p>
+            <p className="mt-2 text-sm text-black/60 dark:text-white/60">
+              Most scans take under a minute. This page updates by itself when the report is ready.
+            </p>
+            <AutoRefresh />
+          </main>
+        </>
       );
     }
     throw err;
@@ -51,21 +78,7 @@ export default async function ReportPage({
 
   return (
     <>
-      {!printMode ? (
-        <header className="flex items-center justify-between px-6 py-4 border-b border-black/10 dark:border-white/10">
-          <Link href="/" className="font-semibold">
-            {brand.name}
-          </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Show when="signed-out">
-              <Link href="/sign-in" className="inline-flex min-h-8 items-center">Sign in</Link>
-            </Show>
-            <Show when="signed-in">
-              <UserButton />
-            </Show>
-          </nav>
-        </header>
-      ) : null}
+      {!printMode ? <ReportHeader /> : null}
       <ReportView report={report} printMode={printMode} initialShareLinks={initialShareLinks} />
     </>
   );
