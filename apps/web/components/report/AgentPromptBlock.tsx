@@ -32,13 +32,13 @@ export function AgentPromptBlock({
           <button
             type="button"
             onClick={handleCopy}
-            className="shrink-0 rounded border border-brand-accent/40 px-2 py-0.5 text-xs font-medium text-nx-on-accent-soft"
+            className="shrink-0 min-h-8 rounded border border-brand-accent/40 px-3 text-xs font-medium text-nx-on-accent-soft"
           >
             {copied ? "Copied" : "Copy"}
           </button>
         ) : null}
       </div>
-      <p className="mt-1.5 whitespace-pre-wrap text-sm">{prompt}</p>
+      <p className="mt-1.5 whitespace-pre-wrap text-sm [overflow-wrap:anywhere]">{prompt}</p>
     </div>
   );
 }

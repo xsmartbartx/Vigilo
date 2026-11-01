@@ -41,14 +41,14 @@ export function FindingCard({
           >
             {finding.severity}
           </span>
-          <h3 className="mt-1.5 font-medium">{finding.title}</h3>
+          <h3 className="mt-1.5 font-medium [overflow-wrap:anywhere]">{finding.title}</h3>
         </div>
         <span className="shrink-0 text-xs text-black/60 dark:text-white/65">{finding.check_id}</span>
       </div>
 
-      <p className="mt-2 text-sm text-black/70 dark:text-white/70">{finding.summary}</p>
+      <p className="mt-2 text-sm text-black/70 dark:text-white/70 [overflow-wrap:anywhere]">{finding.summary}</p>
       {finding.why_here ? (
-        <p className="mt-2 text-sm">
+        <p className="mt-2 text-sm [overflow-wrap:anywhere]">
           <span className="font-medium">Why this matters for your app: </span>
           {finding.why_here}
         </p>
@@ -66,13 +66,13 @@ export function FindingCard({
             </span>
           ) : null}
         </div>
-        <p className="mt-1 text-sm">{finding.remediation.explanation}</p>
-        <p className="mt-2 text-xs text-black/60 dark:text-white/65">
+        <p className="mt-1 text-sm [overflow-wrap:anywhere]">{finding.remediation.explanation}</p>
+        <p className="mt-2 text-xs text-black/60 dark:text-white/65 [overflow-wrap:anywhere]">
           <span className="font-medium">Impact: </span>
           {finding.remediation.impact}
         </p>
         {finding.remediation.remediation_steps.length > 0 ? (
-          <ol className="mt-2 list-decimal space-y-1 pl-4 text-sm">
+          <ol className="mt-2 list-decimal space-y-1 pl-4 text-sm [overflow-wrap:anywhere]">
             {finding.remediation.remediation_steps.map((step, index) => (
               <li key={index}>{step}</li>
             ))}
@@ -89,7 +89,7 @@ export function FindingCard({
                 href={reference}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="text-brand-accent underline underline-offset-2"
+                className="text-brand-accent underline underline-offset-2 [overflow-wrap:anywhere]"
               >
                 {reference}
               </a>

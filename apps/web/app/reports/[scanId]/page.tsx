@@ -58,7 +58,7 @@ export default async function ReportPage({
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Show when="signed-out">
-              <Link href="/sign-in">Sign in</Link>
+              <Link href="/sign-in" className="inline-flex min-h-8 items-center">Sign in</Link>
             </Show>
             <Show when="signed-in">
               <UserButton />
