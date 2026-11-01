@@ -1,4 +1,5 @@
 import type { ScanReportResponse } from "../../lib/types";
+import { formatUtcDateTime } from "../../lib/datetime";
 
 const GRADE_COLOR: Record<string, string> = {
   A: "text-severity-pass",
@@ -37,7 +38,7 @@ export function ScoreHeader({ report }: { report: ScanReportResponse }) {
         </p>
       ) : null}
       <p className="text-xs text-black/60 dark:text-white/65 mt-2">
-        Scanned {new Date(report.generated_at).toLocaleString()} · registry {report.registry_version}
+        Scanned {formatUtcDateTime(report.generated_at)} · registry {report.registry_version}
       </p>
       <p className="text-xs text-black/60 dark:text-white/65 mt-4 max-w-prose">
         This is an automated assessment, not a certification, and reflects the target&apos;s state
