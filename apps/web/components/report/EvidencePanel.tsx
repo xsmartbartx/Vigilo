@@ -1,4 +1,5 @@
 import type { EvidenceResponse } from "../../lib/types";
+import { formatUtcDateTime } from "../../lib/datetime";
 
 export function EvidencePanel({
   evidence,
@@ -26,7 +27,7 @@ export function EvidencePanel({
           </pre>
         ) : null}
         <p className="text-xs text-black/60 dark:text-white/65">
-          Captured {new Date(evidence.captured_at).toLocaleString()}
+          Captured {formatUtcDateTime(evidence.captured_at)}
         </p>
       </div>
     </details>

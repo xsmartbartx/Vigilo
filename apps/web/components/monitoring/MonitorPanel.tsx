@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { api, ApiError } from "../../lib/api";
 import type { EntitlementsResponse, MonitorResponse } from "../../lib/types";
+import { formatUtcDateTime } from "../../lib/datetime";
 
 const JWT_TEMPLATE = process.env.NEXT_PUBLIC_CLERK_JWT_TEMPLATE ?? "vigilo-api";
 
@@ -106,7 +107,7 @@ export function MonitorPanel({
       {monitor?.enabled ? (
         <>
           <p className="text-black/60 dark:text-white/60">
-            Next scheduled scan: {new Date(monitor.next_run_at).toLocaleString()}
+            Next scheduled scan: {formatUtcDateTime(monitor.next_run_at)}
           </p>
           <button
             type="button"

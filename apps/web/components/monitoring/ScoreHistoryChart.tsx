@@ -1,4 +1,5 @@
 import type { ScoreHistoryEntry } from "../../lib/types";
+import { formatUtcDate } from "../../lib/datetime";
 
 const WIDTH = 600;
 const HEIGHT = 160;
@@ -66,8 +67,8 @@ export function ScoreHistoryChart({ scores }: { scores: ScoreHistoryEntry[] }) {
         ))}
       </svg>
       <div className="flex justify-between text-xs text-black/60 dark:text-white/65 mt-1">
-        <span>{new Date(first.created_at).toLocaleDateString()}</span>
-        <span>{new Date(last.created_at).toLocaleDateString()}</span>
+        <span>{formatUtcDate(first.created_at)}</span>
+        <span>{formatUtcDate(last.created_at)}</span>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import type { AlertResponse, AlertType } from "../../lib/types";
+import { formatUtcDateTime } from "../../lib/datetime";
 
 const LABEL_BY_TYPE: Record<AlertType, string> = {
   new_critical: "New critical finding",
@@ -35,7 +36,7 @@ export function AlertTimeline({ alerts }: { alerts: AlertResponse[] }) {
                 {alert.fingerprint ? ` (${alert.fingerprint})` : ""}
               </span>
               <span className="text-xs text-black/60 dark:text-white/65 whitespace-nowrap">
-                {new Date(alert.created_at).toLocaleString()}
+                {formatUtcDateTime(alert.created_at)}
               </span>
             </li>
           ))}

@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { api, ApiError } from "../../lib/api";
+import { formatUtcDate } from "../../lib/datetime";
 import type { ShareLinkResponse } from "../../lib/types";
 
 const JWT_TEMPLATE = process.env.NEXT_PUBLIC_CLERK_JWT_TEMPLATE ?? "vigilo-api";
@@ -87,7 +88,7 @@ export function ShareLinkManager({
                 <span className={isRevoked ? "text-black/60 dark:text-white/65" : ""}>
                   {isRevoked ? "Revoked" : "Active"} · {link.view_count} view
                   {link.view_count === 1 ? "" : "s"}
-                  {link.expires_at ? ` · expires ${new Date(link.expires_at).toLocaleDateString()}` : ""}
+                  {link.expires_at ? ` · expires ${formatUtcDate(link.expires_at)}` : ""}
                 </span>
                 {!isRevoked ? (
                   <button
