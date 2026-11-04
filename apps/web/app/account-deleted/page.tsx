@@ -18,7 +18,7 @@ export default function AccountDeletedPage() {
             Your data is gone and you have been signed out. You can come back and start again with a
             new account whenever you like.
           </p>
-          <Link href="/" className="text-sm text-nx-accent underline underline-offset-2">
+          <Link href="/" className="text-sm text-nx-link underline underline-offset-2">
             Back to the home page
           </Link>
         </Card>

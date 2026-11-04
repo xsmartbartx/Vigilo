@@ -11,19 +11,19 @@ export function socialImage(eyebrow: string, headline: string, footer: string) {
         style={{
           width: "100%",
           height: "100%",
-          background: "#0F172A",
-          color: "#E6EDF7",
+          background: "#09090B",
+          color: "#F4F4F5",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
         }}
       >
-        <div style={{ fontSize: 34, color: "#22D3EE", display: "flex" }}>{eyebrow}</div>
+        <div style={{ fontSize: 34, color: "#818CF8", display: "flex" }}>{eyebrow}</div>
         <div style={{ fontSize: 68, fontWeight: 700, lineHeight: 1.1, display: "flex" }}>
           {headline}
         </div>
-        <div style={{ fontSize: 30, color: "#A3B1C6", display: "flex" }}>{footer}</div>
+        <div style={{ fontSize: 30, color: "#A1A1AA", display: "flex" }}>{footer}</div>
       </div>
     ),
     { ...OG_SIZE },

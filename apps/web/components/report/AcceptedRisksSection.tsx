@@ -81,7 +81,7 @@ export function AcceptedRisksSection({
       open={printMode}
       className="mt-8 border-t border-black/10 dark:border-white/10 pt-6 text-sm"
     >
-      <summary className="cursor-pointer select-none font-semibold uppercase tracking-wide text-black/60 dark:text-white/65">
+      <summary className="cursor-pointer select-none font-semibold text-nx-text-muted">
         Accepted risks ({accepted.length})
       </summary>
       <p className="mt-1 text-xs text-black/60 dark:text-white/65 max-w-prose">

@@ -1,18 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { brand } from "../lib/brand";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 // Absolute URLs for social images need a base; WEB_APP_URL is the public origin.
 const siteUrl = process.env.WEB_APP_URL ?? "http://localhost:3000";
@@ -58,7 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <ClerkProvider dynamic localization={clerkLocalization}>
       <html
         lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+        className="h-full antialiased"
       >
         <body className="min-h-full flex flex-col bg-background text-foreground">
           {children}

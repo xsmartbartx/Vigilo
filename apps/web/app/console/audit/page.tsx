@@ -75,7 +75,7 @@ export default async function AuditPage({
           Apply
         </Button>
         {filtered ? (
-          <Link href="/console/audit" className="pb-2 text-sm text-nx-accent underline underline-offset-2">
+          <Link href="/console/audit" className="pb-2 text-sm text-nx-link underline underline-offset-2">
             Clear filter
           </Link>
         ) : null}
@@ -125,7 +125,7 @@ export default async function AuditPage({
       )}
 
       {olderHref ? (
-        <Link href={olderHref} className="text-sm text-nx-accent underline underline-offset-2">
+        <Link href={olderHref} className="text-sm text-nx-link underline underline-offset-2">
           Older events
         </Link>
       ) : null}

@@ -5,15 +5,15 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 type Size = "sm" | "md" | "lg";
 
 const VARIANT: Record<Variant, string> = {
-  primary: "bg-nx-accent text-nx-on-accent hover:brightness-110 active:brightness-95",
+  primary: "bg-nx-accent text-nx-on-accent shadow-sm hover:brightness-110 active:brightness-95",
   secondary: "border border-nx-border-input bg-nx-bg text-nx-text hover:bg-nx-surface",
   ghost: "text-nx-text hover:bg-nx-surface",
   danger: "bg-nx-danger text-white hover:brightness-110 active:brightness-95",
 };
 const SIZE: Record<Size, string> = {
   sm: "h-8 px-3 text-sm",
-  md: "h-10 px-4 text-sm",
-  lg: "h-12 px-6 text-base",
+  md: "h-9 px-4 text-sm",
+  lg: "h-11 px-5 text-sm",
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -38,7 +38,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-nx-md font-semibold transition-colors",
+        "inline-flex items-center justify-center gap-2 rounded-nx-md font-medium transition-colors",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nx-accent",
         "disabled:cursor-not-allowed disabled:opacity-50",
         VARIANT[variant],

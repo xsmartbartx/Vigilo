@@ -25,7 +25,7 @@ export function AgentPromptBlock({
   return (
     <div className="mt-3 rounded-md border border-brand-accent/40 bg-brand-accent/10 p-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-nx-on-accent-soft">
+        <p className="text-xs font-medium text-nx-on-accent-soft">
           Paste into your AI coding tool
         </p>
         {!printMode ? (
