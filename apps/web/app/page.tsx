@@ -22,7 +22,7 @@ export default function HomePage() {
   return (
     <SiteShell>
       <section aria-labelledby="hero" className="mx-auto w-full max-w-[1120px] px-4 pb-16 pt-16 text-center sm:px-6 sm:pt-24">
-        <p className="text-sm font-medium text-nx-accent">
+        <p className="text-sm font-medium text-nx-link">
           {brand.name} <span className="text-nx-text-muted">· a NEXORA product</span>
         </p>
         <h1
@@ -40,7 +40,7 @@ export default function HomePage() {
         </div>
         <p className="mt-4 text-sm text-nx-text-muted">
           The first scan is free and needs only your email.{" "}
-          <Link href="/#how" className="text-nx-accent underline underline-offset-2">
+          <Link href="/#how" className="text-nx-link underline underline-offset-2">
             See how it works
           </Link>
         </p>

@@ -43,7 +43,7 @@ export function SeverityGroup({
 
         return (
           <section key={severity}>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/65">
+            <h2 className="text-sm font-semibold text-nx-text-muted">
               {SEVERITY_LABEL[severity]} ({group.length})
             </h2>
             <div className="mt-2 space-y-3">

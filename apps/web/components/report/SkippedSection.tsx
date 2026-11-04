@@ -31,7 +31,7 @@ export function SkippedSection({
     <div className="mt-8 space-y-6 border-t border-black/10 dark:border-white/10 pt-6">
       {inconclusive.length > 0 ? (
         <details open={printMode} className="text-sm">
-          <summary className="cursor-pointer select-none font-semibold uppercase tracking-wide text-black/60 dark:text-white/65">
+          <summary className="cursor-pointer select-none font-semibold text-nx-text-muted">
             Couldn&apos;t check ({inconclusive.length})
           </summary>
           <p className="mt-1 text-xs text-black/60 dark:text-white/65 max-w-prose">
@@ -44,7 +44,7 @@ export function SkippedSection({
 
       {notApplicable.length > 0 ? (
         <details open={printMode} className="text-sm">
-          <summary className="cursor-pointer select-none font-semibold uppercase tracking-wide text-black/60 dark:text-white/65">
+          <summary className="cursor-pointer select-none font-semibold text-nx-text-muted">
             Not applicable ({notApplicable.length})
           </summary>
           <p className="mt-1 text-xs text-black/60 dark:text-white/65 max-w-prose">

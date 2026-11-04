@@ -38,7 +38,7 @@ export default async function ConsoleHomePage() {
                     </Link>
                   ) : !available ? (
                     <p className="text-xs text-nx-text-muted">
-                      Not open yet. <Link href={href} className="text-nx-accent underline underline-offset-2">What is planned</Link>
+                      Not open yet. <Link href={href} className="text-nx-link underline underline-offset-2">What is planned</Link>
                     </p>
                   ) : org.role === "owner" || org.role === "admin" ? (
                     <form action={enableProduct}>

@@ -2,15 +2,16 @@
    Roles only; replica-brand changes values. */
 :root {
   --nx-bg: #ffffff;
-  --nx-surface: #f8fafc;
-  --nx-border: #e2e8f0;
-  --nx-border-input: #64748b;
-  --nx-text: #0f172a;
-  --nx-text-muted: #475569;
-  --nx-accent: #0e7490;
+  --nx-surface: #fafafa;
+  --nx-border: #e4e4e7;
+  --nx-border-input: #71717a;
+  --nx-text: #18181b;
+  --nx-text-muted: #52525b;
+  --nx-accent: #4f46e5;
   --nx-on-accent: #ffffff;
-  --nx-accent-soft: #cffafe;
-  --nx-on-accent-soft: #155e75;
+  --nx-link: #4f46e5;
+  --nx-accent-soft: #e0e7ff;
+  --nx-on-accent-soft: #3730a3;
   --nx-danger: #b91c1c;
   --nx-success: #15803d;
   --nx-warning: #a16207;
@@ -20,42 +21,44 @@
   --nx-sev-low: #0e7490;
   --nx-sev-pass: #15803d;
   --nx-radius-sm: 6px;
-  --nx-radius-md: 10px;
-  --nx-radius-lg: 16px;
-  --nx-shadow-card: 0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.10);
-  --nx-shadow-pop: 0 12px 32px rgba(15,23,42,.16);
+  --nx-radius-md: 8px;
+  --nx-radius-lg: 12px;
+  --nx-shadow-card: 0 1px 2px rgba(0,0,0,.05);
+  --nx-shadow-pop: 0 12px 32px rgba(0,0,0,.16);
   --nx-motion-fast: 120ms;
   --nx-motion-base: 200ms;
   --nx-ease: cubic-bezier(.2,.8,.2,1);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-  --nx-bg: #0b1120;
-  --nx-surface: #111a2e;
-  --nx-border: #243049;
-  --nx-border-input: #8795ad;
-  --nx-text: #e6edf7;
-  --nx-text-muted: #a3b1c6;
-  --nx-accent: #22d3ee;
-  --nx-on-accent: #06222b;
-  --nx-accent-soft: #0c3b47;
-  --nx-on-accent-soft: #a5f3fc;
+  --nx-bg: #09090b;
+  --nx-surface: #18181b;
+  --nx-border: #27272a;
+  --nx-border-input: #71717a;
+  --nx-text: #f4f4f5;
+  --nx-text-muted: #a1a1aa;
+  --nx-accent: #4f46e5;
+  --nx-on-accent: #ffffff;
+  --nx-link: #818cf8;
+  --nx-accent-soft: #1e1b4b;
+  --nx-on-accent-soft: #c7d2fe;
   --nx-danger: #f87171;
   --nx-success: #4ade80;
   --nx-warning: #facc15;
   }
 }
 :root[data-theme="dark"] {
-  --nx-bg: #0b1120;
-  --nx-surface: #111a2e;
-  --nx-border: #243049;
-  --nx-border-input: #8795ad;
-  --nx-text: #e6edf7;
-  --nx-text-muted: #a3b1c6;
-  --nx-accent: #22d3ee;
-  --nx-on-accent: #06222b;
-  --nx-accent-soft: #0c3b47;
-  --nx-on-accent-soft: #a5f3fc;
+  --nx-bg: #09090b;
+  --nx-surface: #18181b;
+  --nx-border: #27272a;
+  --nx-border-input: #71717a;
+  --nx-text: #f4f4f5;
+  --nx-text-muted: #a1a1aa;
+  --nx-accent: #4f46e5;
+  --nx-on-accent: #ffffff;
+  --nx-link: #818cf8;
+  --nx-accent-soft: #1e1b4b;
+  --nx-on-accent-soft: #c7d2fe;
   --nx-danger: #f87171;
   --nx-success: #4ade80;
   --nx-warning: #facc15;
@@ -70,6 +73,7 @@
   --color-nx-text-muted: var(--nx-text-muted);
   --color-nx-accent: var(--nx-accent);
   --color-nx-on-accent: var(--nx-on-accent);
+  --color-nx-link: var(--nx-link);
   --color-nx-accent-soft: var(--nx-accent-soft);
   --color-nx-on-accent-soft: var(--nx-on-accent-soft);
   --color-nx-danger: var(--nx-danger);

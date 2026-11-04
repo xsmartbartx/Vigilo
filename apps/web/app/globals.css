@@ -3,15 +3,15 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #18181b;
   /* brand.config.json's theme block — the single source of truth for these
      values; kept in sync by hand since Tailwind's CSS-first config can't
      import JSON directly. */
-  --color-primary: #0f172a;
+  --color-primary: #4f46e5;
   /* Text-safe on white: every pair below is at least 4.5:1 (WCAG AA). They also
      work as badge fills under white text. The dark-mode block swaps the text
      colours for lighter ones; fills (--fill-*) stay the same in both. */
-  --color-accent: #0e7490;
+  --color-accent: #4f46e5;
   --color-critical: #b91c1c;
   --color-high: #c2410c;
   --color-medium: #a16207;
@@ -26,8 +26,11 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* The system stack, as on CodeReviewer: no web font to download. */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   --color-brand-primary: var(--color-primary);
   --color-brand-accent: var(--color-accent);
   --color-severity-critical: var(--color-critical);
@@ -43,9 +46,9 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --color-accent: #22d3ee;
+    --background: #09090b;
+    --foreground: #f4f4f5;
+    --color-accent: #818cf8;
     --color-critical: #f87171;
     --color-high: #fb923c;
     --color-medium: #facc15;
@@ -57,4 +60,26 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/*
+ * Clerk's native CSS variables, so sign-in, sign-up and the user menu use
+ * the same palette and follow light and dark mode.
+ */
+:root {
+  --clerk-color-primary: var(--nx-accent);
+  --clerk-color-primary-foreground: var(--nx-on-accent);
+  --clerk-color-background: var(--nx-bg);
+  --clerk-color-foreground: var(--nx-text);
+  --clerk-color-muted: var(--nx-surface);
+  --clerk-color-muted-foreground: var(--nx-text-muted);
+  --clerk-color-neutral: var(--nx-text);
+  --clerk-color-border: var(--nx-border);
+  --clerk-color-input: var(--nx-bg);
+  --clerk-color-input-foreground: var(--nx-text);
+  --clerk-color-ring: var(--nx-accent);
+  --clerk-color-danger: var(--nx-danger);
+  --clerk-color-success: var(--nx-success);
+  --clerk-color-warning: var(--nx-warning);
+  --clerk-border-radius: var(--nx-radius-md);
 }

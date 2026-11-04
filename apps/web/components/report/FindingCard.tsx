@@ -56,7 +56,7 @@ export function FindingCard({
 
       <div className="mt-3 rounded-md bg-black/5 dark:bg-white/5 p-3">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-black/60 dark:text-white/65">
+          <p className="text-xs font-medium text-nx-text-muted">
             How to fix this
           </p>
           {finding.remediation.estimated_effort ? (

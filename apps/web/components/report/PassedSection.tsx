@@ -12,7 +12,7 @@ export function PassedSection({
 
   return (
     <details open={printMode} className="mt-8 border-t border-black/10 dark:border-white/10 pt-6 text-sm">
-      <summary className="cursor-pointer select-none font-semibold uppercase tracking-wide text-black/60 dark:text-white/65">
+      <summary className="cursor-pointer select-none font-semibold text-nx-text-muted">
         Passed ({passed.length})
       </summary>
       <ul className="mt-2 space-y-1">

@@ -22,14 +22,14 @@
     "badgePath": "/badge/{public_id}.svg"
   },
   "theme": {
-    "colorPrimary": "#0F172A",
-    "colorAccent": "#0E7490",
+    "colorPrimary": "#4F46E5",
+    "colorAccent": "#4F46E5",
     "colorCritical": "#B91C1C",
     "colorHigh": "#C2410C",
     "colorMedium": "#A16207",
     "colorLow": "#0E7490",
     "colorPass": "#15803D",
-    "fontSans": "Inter",
-    "fontMono": "JetBrains Mono"
+    "fontSans": "system-ui",
+    "fontMono": "ui-monospace"
   }
 }

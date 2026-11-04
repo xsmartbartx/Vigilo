@@ -29,10 +29,10 @@ export default function PricingPage() {
         />
         <p className="text-sm text-nx-text-muted">
           Questions about a plan?{" "}
-          <Link href="/#faq" className="text-nx-accent underline underline-offset-2">
+          <Link href="/#faq" className="text-nx-link underline underline-offset-2">
             Read the FAQ
           </Link>{" "}
-          or <a href={`mailto:${brand.supportEmail}`} className="text-nx-accent underline underline-offset-2">write to us</a>.
+          or <a href={`mailto:${brand.supportEmail}`} className="text-nx-link underline underline-offset-2">write to us</a>.
         </p>
       </div>
     </SiteShell>

@@ -58,7 +58,7 @@ export function ShareLinkManager({
   return (
     <div className="mt-8 border-t border-black/10 dark:border-white/10 pt-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-black/60 dark:text-white/65">
+        <h2 className="text-sm font-semibold text-nx-text-muted">
           Share this report
         </h2>
         <button

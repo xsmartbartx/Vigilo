@@ -13,7 +13,7 @@ const NAV = [
 ] as const;
 
 const BUTTON =
-  "inline-flex h-9 items-center rounded-nx-md bg-nx-accent px-4 text-sm font-semibold text-nx-on-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nx-accent";
+  "inline-flex h-9 items-center rounded-nx-md bg-nx-accent px-4 text-sm font-medium text-nx-on-accent shadow-sm hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-nx-accent";
 
 // Two bars, as on a product site under a company site: a thin company bar with the way
 // back to NEXORA, then the product bar with this product's own navigation.
@@ -22,7 +22,7 @@ export function SiteHeader() {
     <header className="sticky -top-9 z-30">
       <div className="border-b border-nx-border bg-nx-surface">
         <div className="mx-auto flex h-9 w-full max-w-[1120px] items-center justify-between px-4 text-xs sm:px-6">
-          <a href={NEXORA_URL} className="font-semibold tracking-[0.12em] text-nx-text hover:underline">
+          <a href={NEXORA_URL} className="font-semibold tracking-tight text-nx-text hover:underline">
             NEXORA
           </a>
           <a href={`${NEXORA_URL}/products`} className="text-nx-text-muted hover:text-nx-text hover:underline">
@@ -30,9 +30,9 @@ export function SiteHeader() {
           </a>
         </div>
       </div>
-      <div className="border-b border-nx-border bg-nx-bg/90 backdrop-blur">
-        <div className="mx-auto flex h-14 w-full max-w-[1120px] items-center gap-x-6 px-4 sm:px-6">
-          <Link href="/" className="text-lg font-semibold text-nx-text">
+      <div className="border-b border-nx-border bg-nx-bg/80 backdrop-blur">
+        <div className="mx-auto flex h-16 w-full max-w-[1120px] items-center gap-x-6 px-4 sm:px-6">
+          <Link href="/" className="text-lg font-semibold tracking-tight text-nx-text">
             {brand.name}
           </Link>
           <nav aria-label={`${brand.name} sections`} className="flex min-w-0 flex-1 gap-x-5 overflow-x-auto text-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -40,7 +40,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="whitespace-nowrap text-nx-text-muted hover:text-nx-text hover:underline"
+                className="whitespace-nowrap text-nx-text-muted transition-colors hover:text-nx-text"
               >
                 {item.label}
               </Link>

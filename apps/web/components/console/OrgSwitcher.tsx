@@ -29,7 +29,7 @@ export function OrgSwitcher({ orgs, active }: { orgs: Org[]; active: Org }) {
         </Button>
       </form>
       <Badge>{active.role}</Badge>
-      <Link href="/console/new-org" className="text-nx-accent underline underline-offset-2">
+      <Link href="/console/new-org" className="text-nx-link underline underline-offset-2">
         New organisation
       </Link>
     </div>

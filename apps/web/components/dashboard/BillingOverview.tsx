@@ -38,7 +38,7 @@ function action(line: BillingProductLine, orgId: string) {
   if (!line.can_purchase) return <span className="text-nx-text-muted">Not available to buy yet</span>;
   if (line.status === "active") return <ManageSubscriptionButton orgId={orgId} />;
   return (
-    <a href="#plans" className="text-nx-accent underline underline-offset-2">
+    <a href="#plans" className="text-nx-link underline underline-offset-2">
       See plans
     </a>
   );

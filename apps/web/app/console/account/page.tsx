@@ -46,7 +46,7 @@ export default async function AccountPage() {
                     {b.detail}{" "}
                     <Link
                       href={b.kind === "members" ? "/console/members" : "/dashboard/billing"}
-                      className="text-nx-accent underline underline-offset-2"
+                      className="text-nx-link underline underline-offset-2"
                     >
                       {b.kind === "members" ? "Open members" : "Open billing"}
                     </Link>

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nexora">
   <!-- PLACEHOLDER mark from replica/brand.md's brief: a steady lens with a moving point.
        Replace with the real logo once the name is cleared. -->
-  <rect width="64" height="64" rx="14" fill="#0F172A"/>
-  <circle cx="32" cy="32" r="14" fill="none" stroke="#22D3EE" stroke-width="5"/>
-  <circle cx="42" cy="22" r="4" fill="#22D3EE"/>
+  <rect width="64" height="64" rx="14" fill="#09090B"/>
+  <circle cx="32" cy="32" r="14" fill="none" stroke="#818CF8" stroke-width="5"/>
+  <circle cx="42" cy="22" r="4" fill="#818CF8"/>
 </svg>

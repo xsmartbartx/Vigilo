@@ -47,7 +47,7 @@ export function LandingSections() {
           {STEPS.map((s, i) => (
             <li key={s.title}>
               <Card className="h-full space-y-2">
-                <p className="text-sm font-semibold text-nx-accent">Step {i + 1}</p>
+                <p className="text-sm font-semibold text-nx-link">Step {i + 1}</p>
                 <h3 className="text-lg font-semibold text-nx-text">{s.title}</h3>
                 <p className="text-sm text-nx-text-muted">{s.body}</p>
               </Card>
@@ -88,7 +88,7 @@ export function LandingSections() {
           ))}
         </ul>
         <p className="text-sm text-nx-text-muted">
-          Pay yearly for $290 instead of $348. <Link href="/pricing" className="text-nx-accent underline underline-offset-2">Compare plans</Link>
+          Pay yearly for $290 instead of $348. <Link href="/pricing" className="text-nx-link underline underline-offset-2">Compare plans</Link>
         </p>
       </section>
 
